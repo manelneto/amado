@@ -1,17 +1,22 @@
 import pygame
 import sys
+import levels
 
 class Amado:
-    def __init__(self, board):
-        self.board = board
-        self.board_size = len(board)
+    def __init__(self, level: int):
+        self.level = level
+
+        self.board = levels.STARTS[self.level]
+        self.board_size = len(self.board)
+        self.goal_board = levels.GOALS[self.level]
+
         self.colors = {'r', 'y', 'b'}
         self.row, self.col = 0, 0
 
         # pygame screen
-        self.cell_size = 100
-        self.screen_width = self.board_size * self.cell_size
-        self.screen_height = self.board_size * self.cell_size
+        self.cell_size = 75
+        self.screen_width = 1200
+        self.screen_height = 800
         pygame.init()
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
 
@@ -19,7 +24,7 @@ class Amado:
         pygame.init()
 
         # Colors
-        self.background_color = (255, 255, 255)
+        self.background_color = (0, 0, 0)
         self.colors = {
             'r': (255, 0, 0),
             'y': (255, 255, 0),
@@ -30,14 +35,51 @@ class Amado:
         pygame.display.set_caption('Amado Game')
 
     def draw_board(self):
+        left_x = int(self.screen_width / 3 - (self.board_size * self.cell_size) / 2)
+        top_y = int(self.screen_height / 2 - (self.board_size * self.cell_size) / 2)
+
         for y in range(self.board_size):
             for x in range(self.board_size):
-                rect = pygame.Rect(x*self.cell_size, y*self.cell_size, self.cell_size, self.cell_size)
+                rect = pygame.Rect(left_x + x*self.cell_size,top_y + y*self.cell_size, self.cell_size, self.cell_size)
                 pygame.draw.rect(self.screen, self.colors[self.board[y][x]], rect)
                 if y == self.row and x == self.col:
                     pygame.draw.rect(self.screen, self.highlight_color, rect, 5)  # Highlight the current cell
 
-    def move(self, row, col):
+    def draw_goal(self):
+        # draw the red line
+        pygame.draw.line(self.screen, self.colors['r'], (self.screen_width - 300, 0), (self.screen_width - 300, self.screen_height), 5)
+
+        # draw the goal board
+        goal_board_cell_size = int(self.cell_size / 2)
+        left_x = self.screen_width - 150 - (self.board_size * goal_board_cell_size) / 2
+        top_y = (self.board_size * goal_board_cell_size) / 2
+
+        for y in range(self.board_size):
+            for x in range(self.board_size):
+                rect = pygame.Rect(left_x + x*goal_board_cell_size,top_y + y*goal_board_cell_size, goal_board_cell_size, goal_board_cell_size)
+                pygame.draw.rect(self.screen, self.colors[self.goal_board[y][x]], rect)
+
+    def update(self) -> bool:
+        # Should return False if the game loop should stop
+        # And True otherwise
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w:
+                    game.up()
+                elif event.key == pygame.K_s:
+                    game.down()
+                elif event.key == pygame.K_a:
+                    game.left()
+                elif event.key == pygame.K_d:
+                    game.right()
+                elif event.key == pygame.K_q:
+                    return False
+                
+        return True
+
+    def move(self, row: int , col: int):
         color1 = self.board[self.row][self.col]
         color2 = self.board[row][col]
         if color1 != color2:
@@ -65,38 +107,22 @@ class Amado:
         if self.col < self.board_size - 1:
             self.move(self.row, self.col + 1)
 
+    def render(self):
+        game.screen.fill(game.background_color)
+        game.draw_board()
+        game.draw_goal()
+        pygame.display.flip()
+
 
 if __name__ == "__main__":
 
-    board = [
-        ['y', 'y', 'y', 'b'],
-        ['r', 'r', 'b', 'b'],
-        ['r', 'b', 'b', 'b'],
-        ['y', 'b', 'y', 'r'],
-    ]
-
-    game = Amado(board)
+    game = Amado(1)
 
     running = True
     while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w:
-                    game.up()
-                elif event.key == pygame.K_s:
-                    game.down()
-                elif event.key == pygame.K_a:
-                    game.left()
-                elif event.key == pygame.K_d:
-                    game.right()
-                elif event.key == pygame.K_q:
-                    running = False
+        running = game.update()
+        game.render()
 
-        game.screen.fill(game.background_color)
-        game.draw_board()
-        pygame.display.flip()
-
+    # Ensure a cleen exit
     pygame.quit()
     sys.exit()
