@@ -9,6 +9,7 @@ class Amado:
         self.board = levels.STARTS[self.level]
         self.board_size = len(self.board)
         self.goal_board = levels.GOALS[self.level]
+        self.move_counter = 0
 
         self.colors = {'r', 'y', 'b'}
         self.row, self.col = 0, 0
@@ -22,6 +23,8 @@ class Amado:
 
         # Initialize Pygame
         pygame.init()
+        pygame.font.init()
+        self.font = pygame.font.SysFont('Arial', 45)
 
         # Colors
         self.background_color = (0, 0, 0)
@@ -59,6 +62,11 @@ class Amado:
                 rect = pygame.Rect(left_x + x*goal_board_cell_size,top_y + y*goal_board_cell_size, goal_board_cell_size, goal_board_cell_size)
                 pygame.draw.rect(self.screen, self.colors[self.goal_board[y][x]], rect)
 
+    def draw_counter(self):
+        counter_surface = self.font.render(str(self.move_counter), True, (255, 255, 255))
+        counter_position = (int(self.screen_width / 3), 20)
+        self.screen.blit(counter_surface, counter_position)
+
     def update(self) -> bool:
         # Should return False if the game loop should stop
         # And True otherwise
@@ -86,6 +94,8 @@ class Amado:
             self.board[row][col] = self.swap(color1, color2)
         (self.row, self.col) = (row, col)
 
+        self.move_counter += 1
+
     def swap(self, color1, color2):
         color_keys = set(self.colors.keys())
         color3 = color_keys - {color1, color2}
@@ -111,6 +121,7 @@ class Amado:
         game.screen.fill(game.background_color)
         game.draw_board()
         game.draw_goal()
+        game.draw_counter()
         pygame.display.flip()
 
 
