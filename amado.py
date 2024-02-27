@@ -30,10 +30,10 @@ class Amado:
         self.background_color = (0, 0, 0)
         self.colors = {
             'r': (255, 0, 0),
-            'y': (255, 255, 0),
+            'y': (255, 216, 0),
             'b': (0, 0, 255),
         }
-        self.highlight_color = (0, 255, 0)
+        self.highlight_color = (57, 255, 20)
 
         pygame.display.set_caption('Amado Game')
 
@@ -158,3 +158,4 @@ if __name__ == "__main__":
     # Ensure a cleen exit
     pygame.quit()
     sys.exit()
+
