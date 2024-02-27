@@ -100,36 +100,38 @@ class Amado:
                 
         return True
 
-    def move(self, row: int , col: int):
-        color1 = self.board[self.row][self.col]
-        color2 = self.board[row][col]
-        if color1 != color2:
-            self.board[row][col] = self.swap(color1, color2)
-        (self.row, self.col) = (row, col)
+    def color(self, row: int, col: int):
+        return self.board[row][col]
 
-        self.move_counter += 1
-        self.change_level()
+    def can_move(self, row: int, col: int):
+        return self.row >= 0 and self.row < self.board_size and self.col >= 0 and self.col < self.board_size and self.color(row, col) != 'n'
+
+    def move(self, row: int , col: int):
+        if (self.can_move(row, col)):
+            color1 = self.board[self.row][self.col]
+            color2 = self.board[row][col]
+            if color1 != color2:
+                self.board[row][col] = self.swap(color1, color2)
+            (self.row, self.col) = (row, col)
+            self.move_counter += 1
+            self.change_level()
 
     def swap(self, color1, color2):
         colors = {'r', 'y', 'b'}
         color3 = colors - {color1, color2}
         return color3.pop()
-    
+
     def up(self):
-        if self.row > 0 and self.board[self.row - 1][self.col] != 'n':
-            self.move(self.row - 1, self.col)
+        self.move(self.row - 1, self.col)
 
     def down(self):
-        if self.row < self.board_size - 1 and self.board[self.row + 1][self.col] != 'n':
-            self.move(self.row + 1, self.col)
+        self.move(self.row + 1, self.col)
 
     def left(self):
-        if self.col > 0 and self.board[self.row][self.col - 1] != 'n':
-            self.move(self.row, self.col - 1)
+        self.move(self.row, self.col - 1)
 
     def right(self):
-        if self.col < self.board_size - 1 and self.board[self.row][self.col + 1] != 'n':
-            self.move(self.row, self.col + 1)
+        self.move(self.row, self.col + 1)
 
     def render(self):
         game.screen.fill(game.background_color)
@@ -148,6 +150,11 @@ class Amado:
                 self.goal_board = levels.GOALS[self.level]  
                 self.move_counter = 0 
                 self.row, self.col = 0, 0
+                if (self.board[self.row][self.col] == 'n'):
+                    for col in range(self.board_size):
+                        if (self.board[self.row][col] != 'n'):
+                            self.col = col
+                            break
 
             else:
                 # Victory -> we might show a victory screen in the future
