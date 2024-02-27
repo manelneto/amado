@@ -80,13 +80,13 @@ class Amado:
             if event.type == pygame.QUIT:
                 return False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w:
+                if event.key == pygame.K_UP:
                     game.up()
-                elif event.key == pygame.K_s:
+                elif event.key == pygame.K_DOWN:
                     game.down()
-                elif event.key == pygame.K_a:
+                elif event.key == pygame.K_LEFT:
                     game.left()
-                elif event.key == pygame.K_d:
+                elif event.key == pygame.K_RIGHT:
                     game.right()
                 elif event.key == pygame.K_q:
                     return False
