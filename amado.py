@@ -14,6 +14,12 @@ class Amado:
         self.colors = {'r', 'y', 'b'}
         self.row, self.col = 0, 0
 
+        if (self.board[self.row][self.col] == 'n'):
+            for col in range(self.board_size):
+                if (self.board[self.row][col] != 'n'):
+                    self.col = col
+                    break
+
         # pygame screen
         self.cell_size = 75
         self.screen_width = 1200
@@ -32,6 +38,7 @@ class Amado:
             'r': (255, 0, 0),
             'y': (255, 216, 0),
             'b': (0, 0, 255),
+            'n': (0, 0, 0),
         }
         self.highlight_color = (57, 255, 20)
 
@@ -104,24 +111,24 @@ class Amado:
         self.change_level()
 
     def swap(self, color1, color2):
-        color_keys = set(self.colors.keys())
-        color3 = color_keys - {color1, color2}
+        colors = {'r', 'y', 'b'}
+        color3 = colors - {color1, color2}
         return color3.pop()
     
     def up(self):
-        if self.row > 0:
+        if self.row > 0 and self.board[self.row - 1][self.col] != 'n':
             self.move(self.row - 1, self.col)
 
     def down(self):
-        if self.row < self.board_size - 1:
+        if self.row < self.board_size - 1 and self.board[self.row + 1][self.col] != 'n':
             self.move(self.row + 1, self.col)
 
     def left(self):
-        if self.col > 0:
+        if self.col > 0 and self.board[self.row][self.col - 1] != 'n':
             self.move(self.row, self.col - 1)
 
     def right(self):
-        if self.col < self.board_size - 1:
+        if self.col < self.board_size - 1 and self.board[self.row][self.col + 1] != 'n':
             self.move(self.row, self.col + 1)
 
     def render(self):
@@ -148,7 +155,7 @@ class Amado:
 
 if __name__ == "__main__":
 
-    game = Amado(1)
+    game = Amado(8)
 
     running = True
     while running:
