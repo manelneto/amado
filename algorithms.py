@@ -1,3 +1,27 @@
+from amado import Amado 
+
+def move(game_state: Amado, row: int, col: int) -> Amado:
+    if (game_state.can_move(row, col)):
+        color1 = game_state.color(game_state.row, game_state.col)
+        color2 = game_state.color(row, col)
+        if color1 != color2:
+            game_state.board[row][col] = game_state.swap(color1, color2)
+        return Amado(game_state.board, game_state.goal_board, game_state.move_counter + 1, row, col)
+    else:
+        return game_state       
+
+def up(game_state: Amado) -> Amado:
+    return move(game_state, game_state.row - 1, game_state.col)
+
+def down(game_state: Amado) -> Amado:
+    return move(game_state, game_state.row + 1, game_state.col)
+
+def left(game_state: Amado) -> Amado:
+    return move(game_state, game_state.row, game_state.col - 1)
+
+def right(game_state: Amado) -> Amado:
+    return move(game_state, game_state.row, game_state.col + 1)
+
 # A generic definition of a tree node holding a state of the problem
 class TreeNode:
     def __init__(self, state, parent=None):
