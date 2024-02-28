@@ -14,6 +14,15 @@ class Amado:
                     self.col = col
                     break
 
+    def __hash__(self):
+        return hash(((tuple(l) for l in self.board), self.row, self.col))
+
+    def __eq__(self, other):
+        if isinstance(self, other.__class__):
+            return self.board == other.board and self.row == other.row and self.col == other.col
+        else:
+            return False
+
     def color(self, row: int, col: int) -> str:
         return self.board[row][col]
 
@@ -24,6 +33,3 @@ class Amado:
         colors = {'r', 'y', 'b'}
         color3 = colors - {color1, color2}
         return color3.pop()
-    
-    def goal_test(self) -> bool:
-        return self.board == self.goal_board

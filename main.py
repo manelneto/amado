@@ -1,18 +1,24 @@
 from amado import Amado
 from gui import GUI
+import algorithms
 import levels
 import pygame
 import sys
 
 if __name__ == "__main__":
-    level = 1
+    level = 0
 
     game = Amado(levels.STARTS[level], levels.GOALS[level], 0, 0, 0)
 
-    gui = GUI(game, level)
+    debug = False
 
-    while gui.update() != False:
-        gui.render()
+    if debug:
+        algorithms.breadth_first_search(game)
+    else:
+        gui = GUI(game, level)
+
+        while gui.update() != False:
+            gui.render()
 
     # Ensure a cleen exit
     pygame.quit()
