@@ -1,5 +1,6 @@
 from amado import Amado
 from gui import GUI
+from gui import MainMenu
 import algorithms
 import levels
 import pygame
@@ -15,7 +16,8 @@ if __name__ == "__main__":
     if debug:
         algorithms.breadth_first_search(game)
     else:
-        gui = GUI(game, level)
+        gui = MainMenu()
+        # gui = GUI(game, level)
 
         while gui.update() != False:
             gui.render()
