@@ -13,7 +13,7 @@ class BaseGameScreen:
         self.background_color = (0, 0, 0)
         pygame.display.set_caption('Amado Game')
 
-    def update(self):
+    def update(self) -> bool:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
@@ -62,31 +62,6 @@ class GUI(BaseGameScreen):
 
         move_counter_surface = self.font.render(str(self.game_state.move_counter), True, (255, 255, 255))
         self.screen.blit(move_counter_surface, (self.screen_width / 3, 20))
-
-    def update(self):
-        if not self.handle_events():
-            return False
-
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key in [pygame.K_UP, pygame.K_w]:
-                    self.game_state = algorithms.up(self.game_state)
-                elif event.key in [pygame.K_DOWN, pygame.K_s]:
-                    self.game_state = algorithms.down(self.game_state)
-                elif event.key in [pygame.K_LEFT, pygame.K_a]:
-                    self.game_state = algorithms.left(self.game_state)
-                elif event.key in [pygame.K_RIGHT, pygame.K_d]:
-                    self.game_state = algorithms.right(self.game_state)
-                elif event.key == pygame.K_q:
-                    return False
-        return True
-
-    def render(self):
-        super().render()
-        self.draw_board()
-        self.draw_goal()
-        self.draw_level_info()
-        pygame.display.flip()
 
     def draw_level_info(self):
         # draw current level
