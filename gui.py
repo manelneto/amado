@@ -4,9 +4,10 @@ import levels
 import pygame
 
 class BaseGameScreen:
-    def __init__(self, screen_width: int = 1200, screen_height: int = 800):
+    def __init__(self, screen_width: int = 1200, screen_height: int = 800, change_state_callback=None):
         self.screen_width = screen_width
         self.screen_height = screen_height
+        self.change_state_callback = change_state_callback
         pygame.init()
         pygame.font.init()
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
@@ -25,8 +26,9 @@ class BaseGameScreen:
         pygame.display.flip()
 
 class GUI(BaseGameScreen):
-    def __init__(self, game_state: Amado, level: int):
+    def __init__(self, game_state: Amado, level: int, change_state_callback):
         super().__init__()
+        self.change_state_callback = change_state_callback
         self.game_state = game_state
         self.level = level
         self.cell_size = 75
@@ -83,6 +85,10 @@ class GUI(BaseGameScreen):
                     self.game_state = algorithms.left(self.game_state)
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     self.game_state = algorithms.right(self.game_state)
+                elif event.key == pygame.K_ESCAPE:
+                    if self.change_state_callback:
+                        self.change_state_callback('menu')
+                    return False
                 elif event.key == pygame.K_q:
                     return False
         return True
@@ -95,8 +101,9 @@ class GUI(BaseGameScreen):
         pygame.display.flip()
 
 class MainMenu(BaseGameScreen):
-    def __init__(self):
+    def __init__(self, change_state_callback):
         super().__init__()
+        self.change_state_callback = change_state_callback
         self.selected_level = 0 # Index of the currently selected level
         self.total_levels = len(levels.STARTS)
         self.level_cols = 5  # Number of columns to display levels
@@ -140,7 +147,7 @@ class MainMenu(BaseGameScreen):
         # And True otherwise
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.selected_level = -1
+                # self.selected_level = -1
                 return False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
@@ -152,9 +159,11 @@ class MainMenu(BaseGameScreen):
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     self.selected_level = (self.selected_level + 1) % self.total_levels
                 elif event.key == pygame.K_RETURN:
+                    if self.change_state_callback:
+                        self.change_state_callback('game', self.selected_level)
                     return False
                 elif event.key == pygame.K_q:
-                    self.selected_level = -1
+                    # self.selected_level = -1
                     return False
                 
         return True
