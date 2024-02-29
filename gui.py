@@ -1,5 +1,6 @@
 from amado import Amado 
 import algorithms
+import levels
 import pygame
 
 class BaseGameScreen:
@@ -103,3 +104,50 @@ class GUI(BaseGameScreen):
 class MainMenu(BaseGameScreen):
     def __init__(self):
         super().__init__()
+
+    def draw_main_menu(self):
+        # Title
+        title_font = pygame.font.SysFont('Arial', 90)
+        title_surface = title_font.render("Amado", True, (255, 255, 255))
+        title_rect = title_surface.get_rect(center=(self.screen_width / 2, 50 + title_surface.get_height() / 2))
+
+        self.screen.blit(title_surface, title_rect)
+
+        # Draw levels
+        number_of_levels = len(levels.STARTS)
+        self.draw_levels_menu(number_of_levels)
+
+    def draw_levels_menu(self, total_levels):
+        cols = 5  # Number of columns to display levels
+        margin = 50  # Margin around the grid
+        spacing = 20  # Space between each level button/text
+        
+        # Calculate sizes
+        content_width = self.screen_width - (margin * 2)
+        content_height = self.screen_height - (margin * 2) - 100
+        level_font = pygame.font.SysFont('Arial', 30)
+        
+        # Calculate column width and row height based on total levels
+        col_width = content_width / cols
+        rows = (total_levels + cols - 1) // cols
+        row_height = content_height / rows
+        
+        # Draw levels
+        for i in range(total_levels):
+            col = i % cols
+            row = i // cols
+            level_text = f"Level {i + 1}"
+            level_surface = level_font.render(level_text, True, (255, 255, 255))
+            level_rect = level_surface.get_rect()
+            
+            # Calculate position
+            x = margin + (col * col_width) + (col_width - level_rect.width) / 2
+            y = margin + 100 + (row * row_height) + (row_height - level_rect.height) / 2  # Offset by 100px for title
+            
+            self.screen.blit(level_surface, (x, y))
+
+
+    def render(self):
+        self.screen.fill(self.background_color)
+        self.draw_main_menu()
+        pygame.display.flip()
