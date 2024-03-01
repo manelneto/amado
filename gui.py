@@ -13,7 +13,7 @@ class BaseGameScreen:
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         self.font = pygame.font.SysFont('Arial', 45)
         self.background_color = (0, 0, 0)
-        self.cell_size = 75
+        self.game_cell_size = 75
         self.colors = {'r': (255, 0, 0), 'y': (255, 216, 0), 'b': (0, 0, 255), 'n': (0, 0, 0)}
         self.highlight_color = (57, 255, 20)
         pygame.display.set_caption('Amado Game')
@@ -31,7 +31,7 @@ class BaseGameScreen:
     # game_board -> True to highlight the selected cell, False otherwise
     def draw_board(self, pos_x, pos_y, board, scale, game_board = False):
         board_size = len(board)
-        cell_size = self.cell_size * scale
+        cell_size = self.game_cell_size * scale
         left_x = pos_x
         top_y = pos_y
 
@@ -55,13 +55,18 @@ class GUI(BaseGameScreen):
         pygame.draw.line(self.screen, self.colors['r'], (self.screen_width - 300, 0), (self.screen_width - 300, self.screen_height), 5)
         
         # draw current level
-        counter_surface = self.font.render("Level " + str(self.level + 1), True, (0, 255, 0))
+        counter_surface = self.font.render("Level " + str(self.level + 1), True, self.highlight_color)
         counter_position = (10, 20)
         self.screen.blit(counter_surface, counter_position)
 
         # draw move counter
         counter_surface = self.font.render(str(self.game_state.move_counter), True, (255, 255, 255))
         counter_position = (int(self.screen_width / 3), 20)
+        self.screen.blit(counter_surface, counter_position)
+
+        # draw "ESC to get back"
+        counter_surface = pygame.font.SysFont('Arial', 25).render("Press ESC for Menu" , True, (255, 255, 255))
+        counter_position = (10, self.screen_height - 30)
         self.screen.blit(counter_surface, counter_position)
 
     def update(self) -> bool:
@@ -91,13 +96,13 @@ class GUI(BaseGameScreen):
         self.screen.fill(self.background_color)
 
         # Draw play board
-        board_x = int(self.screen_width / 3 - (len(self.game_state.board) * self.cell_size) / 2)
-        board_y = int(self.screen_height / 2 - (len(self.game_state.board) * self.cell_size) / 2)
+        board_x = int(self.screen_width / 3 - (len(self.game_state.board) * self.game_cell_size) / 2)
+        board_y = int(self.screen_height / 2 - (len(self.game_state.board) * self.game_cell_size) / 2)
         self.draw_board(board_x, board_y, self.game_state.board, 1, True)
 
         # Draw goal board
-        goal_board_cell_size = int(self.cell_size / 2)
-        scale = goal_board_cell_size / self.cell_size
+        goal_board_cell_size = int(self.game_cell_size / 2)
+        scale = goal_board_cell_size / self.game_cell_size
         left_x = self.screen_width - 150 - (len(self.game_state.goal_board) * goal_board_cell_size) / 2
         top_y = (len(self.game_state.goal_board) * goal_board_cell_size) / 2
         self.draw_board(left_x, top_y, self.game_state.goal_board, scale)
@@ -158,7 +163,7 @@ class MainMenu(BaseGameScreen):
             level_board = levels.GOALS[i]
 
             # Calculate the width of the mini board
-            mini_board_width = len(level_board[0]) * self.cell_size * 0.1
+            mini_board_width = len(level_board[0]) * self.game_cell_size * 0.1
 
             # Calculate the position for the mini board below the level text, centered
             mini_board_pos_x = text_x - mini_board_width / 2
