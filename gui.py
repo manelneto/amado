@@ -13,6 +13,9 @@ class BaseGameScreen:
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         self.font = pygame.font.SysFont('Arial', 45)
         self.background_color = (0, 0, 0)
+        self.cell_size = 75
+        self.colors = {'r': (255, 0, 0), 'y': (255, 216, 0), 'b': (0, 0, 255), 'n': (0, 0, 0)}
+        self.highlight_color = (57, 255, 20)
         pygame.display.set_caption('Amado Game')
 
     def update(self) -> bool:
@@ -46,11 +49,11 @@ class GUI(BaseGameScreen):
         self.change_state_callback = change_state_callback
         self.game_state = game_state
         self.level = level
-        self.cell_size = 75
-        self.colors = {'r': (255, 0, 0), 'y': (255, 216, 0), 'b': (0, 0, 255), 'n': (0, 0, 0)}
-        self.highlight_color = (57, 255, 20)
 
     def draw_level_info(self):
+        # draw the red line
+        pygame.draw.line(self.screen, self.colors['r'], (self.screen_width - 300, 0), (self.screen_width - 300, self.screen_height), 5)
+        
         # draw current level
         counter_surface = self.font.render("Level " + str(self.level + 1), True, (0, 255, 0))
         counter_position = (10, 20)
@@ -100,7 +103,6 @@ class GUI(BaseGameScreen):
         self.draw_board(left_x, top_y, self.game_state.goal_board, scale)
 
         # Draw extra info
-        self.draw_goal()
         self.draw_level_info()
 
         # Update the screen
@@ -127,7 +129,8 @@ class MainMenu(BaseGameScreen):
 
     def draw_levels_menu(self):
         margin = 50
-        content_height = self.screen_height - (margin * 2) - 100
+        top_margin_offset = 250
+        content_height = self.screen_height - (margin * 2) - top_margin_offset
         level_font = pygame.font.SysFont('Arial', 30)
         rows = (self.total_levels + self.level_cols - 1) // self.level_cols
         row_height = content_height / rows
@@ -143,10 +146,28 @@ class MainMenu(BaseGameScreen):
             if i == self.selected_level:
                 level_surface = level_font.render(level_text, True, (0, 255, 0))
 
-            level_rect = level_surface.get_rect(center=((col * col_width) + col_width / 2 + margin, 
-                                                        (row * row_height) + row_height / 2 + 100))
+            # Calculate the position for the text
+            text_x = (col * col_width) + col_width / 2 + margin
+            text_y = (row * row_height) + top_margin_offset
+            level_rect = level_surface.get_rect(center=(text_x, text_y))
 
+            # Draw the level number
             self.screen.blit(level_surface, level_rect)
+
+            # Retrieve the board for the current level
+            level_board = levels.GOALS[i]
+
+            # Calculate the width of the mini board
+            mini_board_width = len(level_board[0]) * self.cell_size * 0.1
+
+            # Calculate the position for the mini board below the level text, centered
+            mini_board_pos_x = text_x - mini_board_width / 2
+            mini_board_pos_y = text_y + level_surface.get_height() / 2 + 10  # Spacing below the level number text
+
+            # Draw the mini board representation
+            mini_board_scale = 0.15
+            self.draw_board(mini_board_pos_x, mini_board_pos_y, level_board, mini_board_scale)
+
 
     def update(self) -> bool:
         # Should return False if the loop should stop
