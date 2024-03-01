@@ -25,6 +25,21 @@ class BaseGameScreen:
         self.screen.fill(self.background_color)
         pygame.display.flip()
 
+    # game_board -> True to highlight the selected cell, False otherwise
+    def draw_board(self, pos_x, pos_y, board, scale, game_board = False):
+        board_size = len(board)
+        cell_size = self.cell_size * scale
+        left_x = pos_x
+        top_y = pos_y
+
+        for y in range(board_size):
+            for x in range(board_size):
+                rect = pygame.Rect(left_x + x*cell_size, top_y + y*cell_size, cell_size, cell_size)
+                pygame.draw.rect(self.screen, self.colors[board[y][x]], rect)
+                if game_board and self.game_state and y == self.game_state.row and x == self.game_state.col:
+                    pygame.draw.rect(self.screen, self.highlight_color, rect, 5)
+
+
 class GUI(BaseGameScreen):
     def __init__(self, game_state: Amado, level: int, change_state_callback):
         super().__init__()
@@ -34,30 +49,6 @@ class GUI(BaseGameScreen):
         self.cell_size = 75
         self.colors = {'r': (255, 0, 0), 'y': (255, 216, 0), 'b': (0, 0, 255), 'n': (0, 0, 0)}
         self.highlight_color = (57, 255, 20)
-
-    def draw_board(self):
-        board_size = self.game_state.board_size
-        left_x = int(self.screen_width / 3 - (board_size * self.cell_size) / 2)
-        top_y = int(self.screen_height / 2 - (board_size * self.cell_size) / 2)
-
-        for y in range(board_size):
-            for x in range(board_size):
-                rect = pygame.Rect(left_x + x*self.cell_size, top_y + y*self.cell_size, self.cell_size, self.cell_size)
-                pygame.draw.rect(self.screen, self.colors[self.game_state.board[y][x]], rect)
-                if y == self.game_state.row and x == self.game_state.col:
-                    pygame.draw.rect(self.screen, self.highlight_color, rect, 5)
-
-    def draw_goal(self):
-        board_size = self.game_state.board_size
-        pygame.draw.line(self.screen, self.colors['r'], (self.screen_width - 300, 0), (self.screen_width - 300, self.screen_height), 5)
-        goal_board_cell_size = int(self.cell_size / 2)
-        left_x = self.screen_width - 150 - (board_size * goal_board_cell_size) / 2
-        top_y = (board_size * goal_board_cell_size) / 2
-
-        for y in range(board_size):
-            for x in range(board_size):
-                rect = pygame.Rect(left_x + x*goal_board_cell_size, top_y + y*goal_board_cell_size, goal_board_cell_size, goal_board_cell_size)
-                pygame.draw.rect(self.screen, self.colors[self.game_state.goal_board[y][x]], rect)
 
     def draw_level_info(self):
         # draw current level
@@ -95,9 +86,24 @@ class GUI(BaseGameScreen):
 
     def render(self):
         self.screen.fill(self.background_color)
-        self.draw_board()
+
+        # Draw play board
+        board_x = int(self.screen_width / 3 - (len(self.game_state.board) * self.cell_size) / 2)
+        board_y = int(self.screen_height / 2 - (len(self.game_state.board) * self.cell_size) / 2)
+        self.draw_board(board_x, board_y, self.game_state.board, 1, True)
+
+        # Draw goal board
+        goal_board_cell_size = int(self.cell_size / 2)
+        scale = goal_board_cell_size / self.cell_size
+        left_x = self.screen_width - 150 - (len(self.game_state.goal_board) * goal_board_cell_size) / 2
+        top_y = (len(self.game_state.goal_board) * goal_board_cell_size) / 2
+        self.draw_board(left_x, top_y, self.game_state.goal_board, scale)
+
+        # Draw extra info
         self.draw_goal()
         self.draw_level_info()
+
+        # Update the screen
         pygame.display.flip()
 
 class MainMenu(BaseGameScreen):
