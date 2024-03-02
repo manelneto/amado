@@ -7,14 +7,14 @@ import pygame
 import sys
 
 def change_state(new_state, level=0):
-    debug = True
+    debug = False
 
     if new_state == 'menu':
         current_screen = MainMenu(change_state_callback=change_state)
     elif new_state == 'game':
         game_state = Amado(levels.STARTS[level], levels.GOALS[level], 0, 0, 0)
         if debug:
-            algorithms.depth_limited_search(game_state, 10)
+            algorithms.depth_first_search(game_state)
             return
         else:
             current_screen = GUI(game_state, level, change_state_callback=change_state)

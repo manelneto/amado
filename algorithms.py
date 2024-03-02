@@ -99,23 +99,25 @@ def breadth_first_search(initial_state):
             
     return None
 
-def depth_first_search(initial_state, goal_state_func, operators_func):
+def depth_first_search(initial_state):
     root = TreeNode(initial_state)   # create the root node in the search tree
     queue = deque([root])   # initialize the queue to store the nodes
-    visitedNodes = set()
+    visited_nodes = set()
     
     while queue:
         node = queue.popleft()  # get first element in the queue
         
-        if (node.state.b1, node.state.b2) in visitedNodes:
+        if (node.game_state) in visited_nodes:
             continue
 
-        visitedNodes.add((node.state.b1, node.state.b2))
+        visited_nodes.add((node.game_state))
         
-        if goal_state_func(node.state):   # check goal state
+        if goal_test(node.game_state):   # check goal state
+            print("WINNER!")    
+            print(node.game_state.board)
             return node
         
-        for state in operators_func(node.state):   # go through next states
+        for state in child_game_states(node.game_state):   # go through next states
             # create tree node with the new state
             newNode = TreeNode(state, node) # node é o pai
             
