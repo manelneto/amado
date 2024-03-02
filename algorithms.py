@@ -76,13 +76,13 @@ def breadth_first_search(initial_state):
         if node.game_state in visited_nodes:
             continue
 
-        print(node.game_state.board)
+        print(node.game_state, "DEPTH = ", node.depth)
 
         visited_nodes.add(node.game_state)
 
         if goal_test(node.game_state):   # check goal state
-            print("WINNER!")    
-            print(node.game_state.board)
+            print("------\nWINNER\n------")
+            print_solution(node)           
             return node
         
         #print(node.game_state.board)
@@ -130,24 +130,21 @@ def depth_first_search(initial_state, goal_state_func, operators_func):
 def depth_limited_search(initial_state, depth_limit):
     root = TreeNode(initial_state)   # create the root node in the search tree
     queue = deque([root])   # initialize the queue to store the nodes
-    visitedNodes = set()
+    visited_nodes = set()
     
     while queue:
         node = queue.popleft()  # get first element in the queue
 
-        if node.depth > depth_limit:
-            break
-        
-        if node.game_state in visitedNodes:
+        if node.depth > depth_limit or node.game_state in visited_nodes:
             continue
 
-        print(node.game_state.board)
+        print(node.game_state, "DEPTH = ", node.depth)
 
-        visitedNodes.add(node.game_state)
+        visited_nodes.add(node.game_state)
         
         if goal_test(node.game_state):   # check goal state
-            print("WINNER!")    
-            print(node.game_state.board)
+            print("------\nWINNER\n------")
+            print_solution(node)
             return node
         
         for state in child_game_states(node.game_state):   # go through next states
@@ -162,9 +159,15 @@ def depth_limited_search(initial_state, depth_limit):
             
     return None
 
-def iterative_deepening_search(initial_state, goal_state_func, operators_func, depth_limit):
+def iterative_deepening_search(initial_state, depth_limit):
     for i in range(depth_limit):
-        result = depth_limited_search(initial_state, goal_state_func, operators_func, i)
+        result = depth_limited_search(initial_state, i)
         if result:
             return result
     return None
+
+def print_solution(node):
+    if node.parent:    
+        print_solution(node.parent)
+    print(node.game_state)
+    return
