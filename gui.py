@@ -2,6 +2,7 @@ from amado import Amado
 import algorithms
 import levels
 import pygame
+import sys
 
 class BaseGameScreen:
     def __init__(self, screen_width: int = 1200, screen_height: int = 800, change_state_callback=None):
@@ -107,11 +108,73 @@ class GUI(BaseGameScreen):
         top_y = (len(self.game_state.goal_board) * goal_board_cell_size) / 2
         self.draw_board(left_x, top_y, self.game_state.goal_board, scale)
 
+        self.draw_algorithms()
+
         # Draw extra info
         self.draw_level_info()
 
         # Update the screen
         pygame.display.flip()
+
+    def draw_algorithms(self):
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        mouse_click = pygame.mouse.get_pressed()
+
+        # draw BFS below current level
+        bfs_surface = pygame.font.SysFont('Arial', 25).render("Breadth First Search", True, (255, 255, 255))
+        bfs_position = (930, 250)
+        bfs_rect = bfs_surface.get_rect(topleft=bfs_position)
+        self.screen.blit(bfs_surface, bfs_position)
+
+        if bfs_rect.collidepoint(mouse_x, mouse_y):
+            bfs_surface = pygame.font.SysFont('Arial', 25).render("Breadth First Search", True, (57, 255, 20))
+            self.screen.blit(bfs_surface, bfs_position)
+
+        # draw DFS below current level
+        dfs_surface = pygame.font.SysFont('Arial', 25).render("Depth First Search", True, (255, 255, 255))
+        dfs_position = (930, 300)
+        dfs_rect = dfs_surface.get_rect(topleft=dfs_position)
+        self.screen.blit(dfs_surface, dfs_position)
+
+        if dfs_rect.collidepoint(mouse_x, mouse_y):
+            dfs_surface = pygame.font.SysFont('Arial', 25).render("Depth First Search", True, (57, 255, 20))
+            self.screen.blit(dfs_surface, dfs_position)
+
+        # draw DLS below current level
+        dls_surface = pygame.font.SysFont('Arial', 25).render("Depth Limited Search", True, (255, 255, 255))
+        dls_position = (930, 350)
+        dls_rect = dls_surface.get_rect(topleft=dls_position)
+        self.screen.blit(dls_surface, dls_position)
+
+        if dls_rect.collidepoint(mouse_x, mouse_y):
+            dls_surface = pygame.font.SysFont('Arial', 25).render("Depth Limited Search", True, (57, 255, 20))
+            self.screen.blit(dls_surface, dls_position)
+
+        # draw IDS below current level
+        ids_surface = pygame.font.SysFont('Arial', 25).render("Iterative Deepening Search", True, (255, 255, 255))
+        ids_position = (930, 400)
+        ids_rect = ids_surface.get_rect(topleft=ids_position)
+        self.screen.blit(ids_surface, ids_position)
+
+        if ids_rect.collidepoint(mouse_x, mouse_y):
+            ids_surface = pygame.font.SysFont('Arial', 25).render("Iterative Deepening Search", True, (57, 255, 20))
+            self.screen.blit(ids_surface, ids_position)
+
+        if mouse_click[0]: 
+            if bfs_rect.collidepoint(mouse_x, mouse_y):
+                algorithms.breadth_first_search(self.game_state)  
+
+            elif dfs_rect.collidepoint(mouse_x, mouse_y):
+                algorithms.depth_first_search(self.game_state)
+
+            elif dls_rect.collidepoint(mouse_x, mouse_y):
+                algorithms.depth_limited_search(self.game_state, 10)
+
+            elif ids_rect.collidepoint(mouse_x, mouse_y):
+                algorithms.iterative_deepening_search(self.game_state)
+
+            pygame.quit()
+            sys.exit()
 
 class MainMenu(BaseGameScreen):
     def __init__(self, change_state_callback):
