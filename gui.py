@@ -4,7 +4,7 @@ import levels
 import pygame
 
 class BaseGameScreen:
-    def __init__(self, screen_width: int = 1200, screen_height: int = 800, change_state_callback=None):
+    def __init__(self, screen_width: int = 1200, screen_height: int = 750, change_state_callback=None):
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.change_state_callback = change_state_callback
