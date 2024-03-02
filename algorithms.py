@@ -51,8 +51,6 @@ def child_game_states(game_state: Amado) -> list:
     if move_right != game_state:
         new_states.append(move_right)
 
-    #print(len(new_states))
-
     return new_states
 
 class TreeNode:
@@ -75,8 +73,10 @@ def breadth_first_search(initial_state):
     while queue:
         node = queue.popleft()   # get first element in the queue
 
-        if (node.game_state) in visited_nodes:
+        if node.game_state in visited_nodes:
             continue
+
+        print(node.game_state.board)
 
         visited_nodes.add(node.game_state)
 
@@ -127,7 +127,7 @@ def depth_first_search(initial_state, goal_state_func, operators_func):
             
     return None
 
-def depth_limited_search(initial_state, goal_state_func, operators_func, depth_limit):
+def depth_limited_search(initial_state, depth_limit):
     root = TreeNode(initial_state)   # create the root node in the search tree
     queue = deque([root])   # initialize the queue to store the nodes
     visitedNodes = set()
@@ -135,28 +135,30 @@ def depth_limited_search(initial_state, goal_state_func, operators_func, depth_l
     while queue:
         node = queue.popleft()  # get first element in the queue
 
-        print(node.state.b1, node.state.b2)
-
         if node.depth > depth_limit:
             break
         
-        if (node.state.b1, node.state.b2) in visitedNodes:
+        if node.game_state in visitedNodes:
             continue
 
-        visitedNodes.add((node.state.b1, node.state.b2))
+        print(node.game_state.board)
+
+        visitedNodes.add(node.game_state)
         
-        if goal_state_func(node.state):   # check goal state
+        if goal_test(node.game_state):   # check goal state
+            print("WINNER!")    
+            print(node.game_state.board)
             return node
         
-        for state in operators_func(node.state):   # go through next states
+        for state in child_game_states(node.game_state):   # go through next states
             # create tree node with the new state
-            newNode = TreeNode(state, node) # node é o pai
+            new_node = TreeNode(state, node) # node é o pai
             
             # link child node to its parent in the tree
-            node.add_child(newNode)
+            node.add_child(new_node)
             
             # enqueue the child node
-            queue.appendleft(newNode)
+            queue.appendleft(new_node)
             
     return None
 
