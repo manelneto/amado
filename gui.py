@@ -166,8 +166,8 @@ class MainMenu(BaseGameScreen):
             mini_board_width = len(level_board[0]) * self.game_cell_size * 0.1
 
             # Calculate the position for the mini board below the level text, centered
-            mini_board_pos_x = text_x - mini_board_width / 2
-            mini_board_pos_y = text_y + level_surface.get_height() / 2 + 10  # Spacing below the level number text
+            mini_board_pos_x = text_x - mini_board_width / 2 - 10
+            mini_board_pos_y = text_y + level_surface.get_height() / 2 + 15   # Spacing below the level number text
 
             # Draw the mini board representation
             mini_board_scale = 0.15
@@ -199,8 +199,6 @@ class MainMenu(BaseGameScreen):
                     return False
 
         return True
-
-
 
     def render(self):
         self.screen.fill(self.background_color)
