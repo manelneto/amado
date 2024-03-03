@@ -102,9 +102,13 @@ class GUI(BaseGameScreen):
 
         # Draw goal board
         goal_board_cell_size = int(self.game_cell_size / 2)
+        
+        if self.level >= 7:
+            goal_board_cell_size /= 2
+
         scale = goal_board_cell_size / self.game_cell_size
         left_x = self.screen_width - 150 - (len(self.game_state.goal_board) * goal_board_cell_size) / 2
-        top_y = (len(self.game_state.goal_board) * goal_board_cell_size) / 2
+        top_y = 50
         self.draw_board(left_x, top_y, self.game_state.goal_board, scale)
 
         self.draw_algorithms()
