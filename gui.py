@@ -102,7 +102,7 @@ class GUI(BaseGameScreen):
 
         # Draw goal board
         goal_board_cell_size = int(self.game_cell_size / 2)
-        
+
         if self.level >= 7:
             goal_board_cell_size /= 2
 
@@ -242,26 +242,27 @@ class MainMenu(BaseGameScreen):
         # And True otherwise
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                # self.selected_level = -1
                 return False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
-                    self.selected_level = (self.selected_level - self.level_cols) % self.total_levels
+                    self.selected_level = max(1, (self.selected_level - self.level_cols - 1) % self.total_levels + 1)
                 elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                    self.selected_level = (self.selected_level + self.level_cols) % self.total_levels
+                    self.selected_level = min(self.total_levels, (self.selected_level + self.level_cols - 1) % self.total_levels + 1)
                 elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    self.selected_level = (self.selected_level - 1) % self.total_levels
+                    if self.selected_level > 1:
+                        self.selected_level -= 1
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                    self.selected_level = (self.selected_level % self.total_levels) + 1
+                    if self.selected_level < self.total_levels:
+                        self.selected_level += 1
                 elif event.key == pygame.K_RETURN:
                     if self.change_state_callback:
                         self.change_state_callback('game', self.selected_level)
                     return False
                 elif event.key == pygame.K_q:
-                    # self.selected_level = -1
                     return False
 
         return True
+
 
     def render(self):
         self.screen.fill(self.background_color)
