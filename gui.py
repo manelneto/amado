@@ -103,8 +103,10 @@ class GUI(BaseGameScreen):
         # Draw goal board
         goal_board_cell_size = int(self.game_cell_size / 2)
 
-        if self.level >= 7:
-            goal_board_cell_size /= 2
+        if self.level >= 7 and self.level <= 9:
+            goal_board_cell_size /= 1.2
+        if self.level == 10:
+            goal_board_cell_size /= 1.7
 
         scale = goal_board_cell_size / self.game_cell_size
         left_x = self.screen_width - 150 - (len(self.game_state.goal_board) * goal_board_cell_size) / 2
