@@ -5,7 +5,7 @@ import pygame
 import sys
 
 class BaseGameScreen:
-    def __init__(self, screen_width: int = 1200, screen_height: int = 800, change_state_callback=None):
+    def __init__(self, screen_width: int = 1200, screen_height: int = 750, change_state_callback=None):
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.change_state_callback = change_state_callback
@@ -58,7 +58,7 @@ class GUI(BaseGameScreen):
         pygame.draw.line(self.screen, self.colors['r'], (self.screen_width - 300, 0), (self.screen_width - 300, self.screen_height), 5)
         
         # draw current level
-        counter_surface = self.font.render("Level " + str(self.level + 1), True, self.highlight_color)
+        counter_surface = self.font.render("Level " + str(self.level), True, self.highlight_color)
         counter_position = (10, 20)
         self.screen.blit(counter_surface, counter_position)
 
@@ -111,9 +111,16 @@ class GUI(BaseGameScreen):
 
         # Draw goal board
         goal_board_cell_size = int(self.game_cell_size / 2)
+
+        if self.level >= 7 and self.level <= 9:
+            goal_board_cell_size /= 1.2
+        if self.level == 10:
+            goal_board_cell_size /= 1.7
+
         scale = goal_board_cell_size / self.game_cell_size
+
         left_x = self.screen_width - 150 - (len(self.goal_board) * goal_board_cell_size) / 2
-        top_y = (len(self.goal_board) * goal_board_cell_size) / 2
+        top_y = 50
         self.draw_board(left_x, top_y, self.goal_board, scale)
 
         self.draw_algorithms()
@@ -188,7 +195,7 @@ class MainMenu(BaseGameScreen):
     def __init__(self, change_state_callback):
         super().__init__()
         self.change_state_callback = change_state_callback
-        self.selected_level = 0 # Index of the currently selected level
+        self.selected_level = 1 # Index of the currently selected level
         self.total_levels = len(levels.STARTS)
         self.level_cols = 5  # Number of columns to display levels
 
@@ -212,10 +219,10 @@ class MainMenu(BaseGameScreen):
         row_height = content_height / rows
         col_width = (self.screen_width - (margin * 2)) / self.level_cols
 
-        for i in range(self.total_levels):
-            col = i % self.level_cols
-            row = i // self.level_cols
-            level_text = f"Level {i + 1}"
+        for i in range(1, self.total_levels + 1):
+            col = (i - 1) % self.level_cols
+            row = (i - 1) // self.level_cols
+            level_text = f"Level {i}"
             level_surface = level_font.render(level_text, True, (255, 255, 255))
 
             # Color green for selected level
@@ -237,8 +244,8 @@ class MainMenu(BaseGameScreen):
             mini_board_width = len(level_board[0]) * self.game_cell_size * 0.1
 
             # Calculate the position for the mini board below the level text, centered
-            mini_board_pos_x = text_x - mini_board_width / 2
-            mini_board_pos_y = text_y + level_surface.get_height() / 2 + 10  # Spacing below the level number text
+            mini_board_pos_x = text_x - mini_board_width / 2 - 10
+            mini_board_pos_y = text_y + level_surface.get_height() / 2 + 15   # Spacing below the level number text
 
             # Draw the mini board representation
             mini_board_scale = 0.15
@@ -250,26 +257,27 @@ class MainMenu(BaseGameScreen):
         # And True otherwise
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                # self.selected_level = -1
                 return False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
-                    self.selected_level = (self.selected_level - self.level_cols) % self.total_levels
+                    self.selected_level = max(1, (self.selected_level - self.level_cols - 1) % self.total_levels + 1)
                 elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                    self.selected_level = (self.selected_level + self.level_cols) % self.total_levels
+                    self.selected_level = min(self.total_levels, (self.selected_level + self.level_cols - 1) % self.total_levels + 1)
                 elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    self.selected_level = (self.selected_level - 1) % self.total_levels
+                    if self.selected_level > 1:
+                        self.selected_level -= 1
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                    self.selected_level = (self.selected_level + 1) % self.total_levels
+                    if self.selected_level < self.total_levels:
+                        self.selected_level += 1
                 elif event.key == pygame.K_RETURN:
                     if self.change_state_callback:
                         self.change_state_callback('game', self.selected_level)
                     return False
                 elif event.key == pygame.K_q:
-                    # self.selected_level = -1
                     return False
-                
+
         return True
+
 
     def render(self):
         self.screen.fill(self.background_color)
