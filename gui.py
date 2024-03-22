@@ -177,19 +177,24 @@ class GUI(BaseGameScreen):
 
         if mouse_click[0]: 
             if bfs_rect.collidepoint(mouse_x, mouse_y):
-                algorithms.breadth_first_search(self.game_state, self.goal_board)  
+                print("\n".join(str(amado) for amado in algorithms.breadth_first_search(self.game_state, self.goal_board)))
+                pygame.quit()
+                sys.exit()
 
             elif dfs_rect.collidepoint(mouse_x, mouse_y):
-                algorithms.depth_first_search(self.game_state, self.goal_board)
+                print("\n".join(str(amado) for amado in algorithms.depth_first_search(self.game_state, self.goal_board)))
+                pygame.quit()
+                sys.exit()
 
             elif dls_rect.collidepoint(mouse_x, mouse_y):
-                algorithms.depth_limited_search(self.game_state, self.goal_board, 8)
+                print("\n".join(str(amado) for amado in algorithms.depth_limited_search(self.game_state, self.goal_board, 8)))
+                pygame.quit()
+                sys.exit()
 
             elif ids_rect.collidepoint(mouse_x, mouse_y):
-                algorithms.iterative_deepening_search(self.game_state, self.goal_board, 8)
-
-            pygame.quit()
-            sys.exit()
+                print("\n".join(str(amado) for amado in algorithms.iterative_deepening_search(self.game_state, self.goal_board, 8)))
+                pygame.quit()
+                sys.exit()
 
 class MainMenu(BaseGameScreen):
     def __init__(self, change_state_callback):

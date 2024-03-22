@@ -74,9 +74,7 @@ def breadth_first_search(initial_state, goal_board):
         node = queue.popleft()
 
         if goal_test(node.game_state, goal_board):
-            print("WINNER!")
-            print_solution(node)
-            return node
+            return get_solution(node)
 
         for state in child_game_states(node.game_state):
             if state not in visited_states:
@@ -103,9 +101,7 @@ def depth_first_search(initial_state, goal_board):
                 visited_states.add(state)
 
                 if goal_test(state, goal_board):
-                    print("WINNER!")
-                    print_solution(new_node) # TODO excede o limite de profundidade de recursão
-                    return new_node
+                    return get_solution(new_node)
 
     return None
 
@@ -118,9 +114,7 @@ def depth_limited_search(initial_state, goal_board, depth_limit):
         node = queue.popleft()
 
         if goal_test(node.game_state, goal_board):
-            print("WINNER!")
-            print_solution(node)
-            return node
+            return get_solution(node)
 
         if node.depth == depth_limit:
             continue
@@ -140,8 +134,10 @@ def iterative_deepening_search(initial_state, goal_board, depth_limit):
             return result
     return None
 
-def print_solution(node):
-    if node.parent:    
-        print_solution(node.parent)
-    print(node.game_state, "DEPTH = ", node.depth)
-    return
+def get_solution(node: TreeNode):
+    print("WINNER!")
+    solution = deque([node.game_state])
+    while node.parent:
+        solution.appendleft(node.parent.game_state)
+        node = node.parent
+    return solution
