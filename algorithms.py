@@ -4,7 +4,7 @@ from copy import deepcopy
 
 # Goal Test
 
-def goal_test(game_state: Amado, goal_board) -> bool:
+def goal_test(game_state: Amado, goal_board: list) -> bool:
     return game_state.board == goal_board
 
 # Operators
@@ -65,7 +65,7 @@ class TreeNode:
         child_node.parent = self
         child_node.depth = self.depth + 1
 
-def breadth_first_search(initial_state, goal_board):
+def breadth_first_search(initial_state: Amado, goal_board: list):
     root = TreeNode(initial_state)
     queue = deque([root])
     visited_states = set([initial_state])
@@ -85,7 +85,7 @@ def breadth_first_search(initial_state, goal_board):
             
     return None
 
-def depth_first_search(initial_state, goal_board):
+def depth_first_search(initial_state: Amado, goal_board: list):
     root = TreeNode(initial_state)
     queue = deque([root])
     visited_states = set([initial_state])
@@ -105,7 +105,7 @@ def depth_first_search(initial_state, goal_board):
 
     return None
 
-def depth_limited_search(initial_state, goal_board, depth_limit):
+def depth_limited_search(initial_state: Amado, goal_board: list, depth_limit: int):
     root = TreeNode(initial_state)
     queue = deque([root])
     visited_states = set([initial_state])
@@ -127,7 +127,7 @@ def depth_limited_search(initial_state, goal_board, depth_limit):
                 
     return None
 
-def iterative_deepening_search(initial_state, goal_board, depth_limit):
+def iterative_deepening_search(initial_state: Amado, goal_board: list, depth_limit: int):
     for i in range(depth_limit + 1):
         result = depth_limited_search(initial_state, goal_board, i)
         if result:
@@ -141,3 +141,12 @@ def get_solution(node: TreeNode):
         solution.appendleft(node.parent.game_state)
         node = node.parent
     return solution
+
+def heuristic(game_state: Amado, goal_board: list):
+    # MINIMIZAR
+    different_squares = 0
+    for row in range(game_state.board_size):
+        for col in range(game_state.board_size):
+            if game_state.board[row][col] != goal_board[row][col]:
+                different_squares += 1
+    return different_squares
