@@ -4,8 +4,8 @@ from copy import deepcopy
 
 # Goal Test
 
-def goal_test(game_state: Amado) -> bool:
-    return game_state.board == game_state.goal_board
+def goal_test(game_state: Amado, goal_board) -> bool:
+    return game_state.board == goal_board
 
 # Operators
 
@@ -16,7 +16,7 @@ def move(game_state: Amado, row: int, col: int) -> Amado:
         color2 = current_state.color(row, col)
         if color1 != color2:
             current_state.board[row][col] = current_state.swap(color1, color2)
-        return Amado(current_state.board, current_state.goal_board, current_state.move_counter + 1, row, col)
+        return Amado(current_state.board, row, col)
     else:
         return game_state
 

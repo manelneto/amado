@@ -1,8 +1,6 @@
 class Amado:
-    def __init__(self, board: list, goal_board: list, move_counter: int, row: int, col: int):
+    def __init__(self, board: list, row: int, col: int):
         self.board = board
-        self.goal_board = goal_board
-        self.move_counter = move_counter
         self.row = row
         self.col = col
 

@@ -50,6 +50,8 @@ class GUI(BaseGameScreen):
         self.change_state_callback = change_state_callback
         self.game_state = game_state
         self.level = level
+        self.move_counter = 0
+        self.goal_board = levels.GOALS[level]
 
     def draw_level_info(self):
         # draw the red line
@@ -61,7 +63,7 @@ class GUI(BaseGameScreen):
         self.screen.blit(counter_surface, counter_position)
 
         # draw move counter
-        counter_surface = self.font.render(str(self.game_state.move_counter), True, (255, 255, 255))
+        counter_surface = self.font.render(str(self.move_counter), True, (255, 255, 255))
         counter_position = (int(self.screen_width / 3), 20)
         self.screen.blit(counter_surface, counter_position)
 
@@ -70,27 +72,33 @@ class GUI(BaseGameScreen):
         counter_position = (10, self.screen_height - 30)
         self.screen.blit(counter_surface, counter_position)
 
+    # Should return False if the game loop should sto and True otherwise
     def update(self) -> bool:
-        # Should return False if the game loop should stop
-        # And True otherwise
+        new_game_state = self.game_state
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
-                    self.game_state = algorithms.up(self.game_state)
+                    new_game_state = algorithms.up(self.game_state)
                 elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                    self.game_state = algorithms.down(self.game_state)
+                    new_game_state = algorithms.down(self.game_state)
                 elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    self.game_state = algorithms.left(self.game_state)
+                    new_game_state = algorithms.left(self.game_state)
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                    self.game_state = algorithms.right(self.game_state)
+                    new_game_state = algorithms.right(self.game_state)
                 elif event.key == pygame.K_ESCAPE:
                     if self.change_state_callback:
                         self.change_state_callback('menu')
                     return False
                 elif event.key == pygame.K_q:
                     return False
+            
+        if new_game_state != self.game_state:
+            self.game_state = new_game_state
+            self.move_counter += 1
+
         return True
 
     def render(self):
@@ -104,9 +112,9 @@ class GUI(BaseGameScreen):
         # Draw goal board
         goal_board_cell_size = int(self.game_cell_size / 2)
         scale = goal_board_cell_size / self.game_cell_size
-        left_x = self.screen_width - 150 - (len(self.game_state.goal_board) * goal_board_cell_size) / 2
-        top_y = (len(self.game_state.goal_board) * goal_board_cell_size) / 2
-        self.draw_board(left_x, top_y, self.game_state.goal_board, scale)
+        left_x = self.screen_width - 150 - (len(self.goal_board) * goal_board_cell_size) / 2
+        top_y = (len(self.goal_board) * goal_board_cell_size) / 2
+        self.draw_board(left_x, top_y, self.goal_board, scale)
 
         self.draw_algorithms()
 
