@@ -2,6 +2,7 @@ from amado import Amado
 import algorithms
 import levels
 import pygame
+import sys
 
 class BaseGameScreen:
     def __init__(self, screen_width: int = 1200, screen_height: int = 750, change_state_callback=None):
@@ -49,6 +50,8 @@ class GUI(BaseGameScreen):
         self.change_state_callback = change_state_callback
         self.game_state = game_state
         self.level = level
+        self.move_counter = 0
+        self.goal_board = levels.GOALS[level]
 
     def draw_level_info(self):
         # draw the red line
@@ -60,7 +63,7 @@ class GUI(BaseGameScreen):
         self.screen.blit(counter_surface, counter_position)
 
         # draw move counter
-        counter_surface = self.font.render(str(self.game_state.move_counter), True, (255, 255, 255))
+        counter_surface = self.font.render(str(self.move_counter), True, (255, 255, 255))
         counter_position = (int(self.screen_width / 3), 20)
         self.screen.blit(counter_surface, counter_position)
 
@@ -69,27 +72,33 @@ class GUI(BaseGameScreen):
         counter_position = (10, self.screen_height - 30)
         self.screen.blit(counter_surface, counter_position)
 
+    # Should return False if the game loop should sto and True otherwise
     def update(self) -> bool:
-        # Should return False if the game loop should stop
-        # And True otherwise
+        new_game_state = self.game_state
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
-                    self.game_state = algorithms.up(self.game_state)
+                    new_game_state = algorithms.up(self.game_state)
                 elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                    self.game_state = algorithms.down(self.game_state)
+                    new_game_state = algorithms.down(self.game_state)
                 elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    self.game_state = algorithms.left(self.game_state)
+                    new_game_state = algorithms.left(self.game_state)
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                    self.game_state = algorithms.right(self.game_state)
+                    new_game_state = algorithms.right(self.game_state)
                 elif event.key == pygame.K_ESCAPE:
                     if self.change_state_callback:
                         self.change_state_callback('menu')
                     return False
                 elif event.key == pygame.K_q:
                     return False
+            
+        if new_game_state != self.game_state:
+            self.game_state = new_game_state
+            self.move_counter += 1
+
         return True
 
     def render(self):
@@ -109,9 +118,10 @@ class GUI(BaseGameScreen):
             goal_board_cell_size /= 1.7
 
         scale = goal_board_cell_size / self.game_cell_size
-        left_x = self.screen_width - 150 - (len(self.game_state.goal_board) * goal_board_cell_size) / 2
+
+        left_x = self.screen_width - 150 - (len(self.goal_board) * goal_board_cell_size) / 2
         top_y = 50
-        self.draw_board(left_x, top_y, self.game_state.goal_board, scale)
+        self.draw_board(left_x, top_y, self.goal_board, scale)
 
         self.draw_algorithms()
 
@@ -167,16 +177,19 @@ class GUI(BaseGameScreen):
 
         if mouse_click[0]: 
             if bfs_rect.collidepoint(mouse_x, mouse_y):
-                algorithms.breadth_first_search(self.game_state)  
+                algorithms.breadth_first_search(self.game_state, self.goal_board)  
 
             elif dfs_rect.collidepoint(mouse_x, mouse_y):
-                algorithms.depth_first_search(self.game_state)
+                algorithms.depth_first_search(self.game_state, self.goal_board)
 
             elif dls_rect.collidepoint(mouse_x, mouse_y):
-                algorithms.depth_limited_search(self.game_state)
+                algorithms.depth_limited_search(self.game_state, self.goal_board, 8)
 
             elif ids_rect.collidepoint(mouse_x, mouse_y):
-                algorithms.iterative_deepening_search(self.game_state)
+                algorithms.iterative_deepening_search(self.game_state, self.goal_board, 8)
+
+            pygame.quit()
+            sys.exit()
 
 class MainMenu(BaseGameScreen):
     def __init__(self, change_state_callback):
