@@ -170,16 +170,16 @@ class GUI(BaseGameScreen):
 
         if mouse_click[0]: 
             if bfs_rect.collidepoint(mouse_x, mouse_y):
-                algorithms.breadth_first_search(self.game_state)  
+                algorithms.breadth_first_search(self.game_state, self.goal_board)  
 
             elif dfs_rect.collidepoint(mouse_x, mouse_y):
-                algorithms.depth_first_search(self.game_state)
+                algorithms.depth_first_search(self.game_state, self.goal_board)
 
             elif dls_rect.collidepoint(mouse_x, mouse_y):
-                algorithms.depth_limited_search(self.game_state, 10)
+                algorithms.depth_limited_search(self.game_state, self.goal_board, 8)
 
             elif ids_rect.collidepoint(mouse_x, mouse_y):
-                algorithms.iterative_deepening_search(self.game_state)
+                algorithms.iterative_deepening_search(self.game_state, self.goal_board, 8)
 
             pygame.quit()
             sys.exit()

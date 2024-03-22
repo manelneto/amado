@@ -65,103 +65,77 @@ class TreeNode:
         child_node.parent = self
         child_node.depth = self.depth + 1
 
-def breadth_first_search(initial_state):
-    root = TreeNode(initial_state)   # create the root node in the search tree
-    queue = deque([root])   # initialize the queue to store the nodes
-    visited_nodes = set()
+def breadth_first_search(initial_state, goal_board):
+    root = TreeNode(initial_state)
+    queue = deque([root])
+    visited_states = set([initial_state])
     
     while queue:
-        node = queue.popleft()   # get first element in the queue
+        node = queue.popleft()
 
-        if node.game_state in visited_nodes:
-            continue
-
-        print(node.game_state, "DEPTH = ", node.depth)
-
-        visited_nodes.add(node.game_state)
-
-        if goal_test(node.game_state):   # check goal state
-            print("------\nWINNER\n------")
-            print_solution(node)           
-            return node
-
-        for state in child_game_states(node.game_state):   # go through next states
-            # create tree node with the new state
-            new_node = TreeNode(state, node) # node é o pai
-            
-            # link child node to its parent in the tree
-            node.add_child(new_node)
-            
-            # enqueue the child node
-            queue.append(new_node)
-            
-    return None
-
-def depth_first_search(initial_state):
-    root = TreeNode(initial_state)   # create the root node in the search tree
-    queue = deque([root])   # initialize the queue to store the nodes
-    visited_nodes = set()
-    
-    while queue:
-        node = queue.popleft()  # get first element in the queue
-        
-        if (node.game_state) in visited_nodes:
-            continue
-
-        visited_nodes.add((node.game_state))
-        
-        if goal_test(node.game_state):   # check goal state
-            print("WINNER!")    
-            print(node.game_state.board)
-            return node
-        
-        for state in child_game_states(node.game_state):   # go through next states
-            # create tree node with the new state
-            newNode = TreeNode(state, node) # node é o pai
-            
-            # link child node to its parent in the tree
-            node.add_child(newNode)
-            
-            # enqueue the child node
-            queue.appendleft(newNode)
-            
-    return None
-
-def depth_limited_search(initial_state, depth_limit):
-    root = TreeNode(initial_state)   # create the root node in the search tree
-    queue = deque([root])   # initialize the queue to store the nodes
-    visited_nodes = set()
-    
-    while queue:
-        node = queue.popleft()  # get first element in the queue
-
-        if node.depth > depth_limit or node.game_state in visited_nodes:
-            continue
-
-        print(node.game_state, "DEPTH = ", node.depth)
-
-        visited_nodes.add(node.game_state)
-        
-        if goal_test(node.game_state):   # check goal state
-            print("------\nWINNER\n------")
+        if goal_test(node.game_state, goal_board):
+            print("WINNER!")
             print_solution(node)
             return node
-        
-        for state in child_game_states(node.game_state):   # go through next states
-            # create tree node with the new state
-            new_node = TreeNode(state, node) # node é o pai
-            
-            # link child node to its parent in the tree
-            node.add_child(new_node)
-            
-            # enqueue the child node
-            queue.appendleft(new_node)
+
+        for state in child_game_states(node.game_state):
+            if state not in visited_states:
+                new_node = TreeNode(state, node)
+                node.add_child(new_node)
+                queue.append(new_node)
+                visited_states.add(state)
             
     return None
 
-def iterative_deepening_search(initial_state, depth_limit):
-    for i in range(depth_limit):
-        result = depth_limited_search(initial_state, i)
+def depth_first_search(initial_state, goal_board):
+    root = TreeNode(initial_state)
+    queue = deque([root])
+    visited_states = set([initial_state])
+
+    while queue:
+        node = queue.popleft()
+        
+        for state in child_game_states(node.game_state):
+            if state not in visited_states:
+                new_node = TreeNode(state, node)
+                node.add_child(new_node)
+                queue.appendleft(new_node)
+                visited_states.add(state)
+
+                if goal_test(state, goal_board):
+                    print("WINNER!")
+                    print_solution(new_node) # TODO excede o limite de profundidade de recursão
+                    return new_node
+
+    return None
+
+def depth_limited_search(initial_state, goal_board, depth_limit):
+    root = TreeNode(initial_state)
+    queue = deque([root])
+    visited_states = set([initial_state])
+    
+    while queue:
+        node = queue.popleft()
+
+        if goal_test(node.game_state, goal_board):
+            print("WINNER!")
+            print_solution(node)
+            return node
+
+        if node.depth == depth_limit:
+            continue
+        
+        for state in child_game_states(node.game_state):
+            if state not in visited_states:
+                new_node = TreeNode(state, node)
+                node.add_child(new_node)
+                queue.appendleft(new_node)
+                
+    return None
+
+def iterative_deepening_search(initial_state, goal_board, depth_limit):
+    for i in range(depth_limit + 1):
+        result = depth_limited_search(initial_state, goal_board, i)
         if result:
             return result
     return None
@@ -169,5 +143,5 @@ def iterative_deepening_search(initial_state, depth_limit):
 def print_solution(node):
     if node.parent:    
         print_solution(node.parent)
-    print(node.game_state)
+    print(node.game_state, "DEPTH = ", node.depth)
     return
