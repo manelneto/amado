@@ -283,27 +283,22 @@ class GUI(BaseGameScreen):
         if mouse_click[0]: 
             if bfs_rect.collidepoint(mouse_x, mouse_y):
                 # print("\n".join(str(amado) for amado in algorithms.breadth_first_search(self.game_state, self.goal_board)))
-                # self.bot_playing = True
                 self.bot_plays = algorithms.breadth_first_search(self.game_state, self.goal_board)
 
             elif dfs_rect.collidepoint(mouse_x, mouse_y):
                 # print("\n".join(str(amado) for amado in algorithms.depth_first_search(self.game_state, self.goal_board)))
-                self.bot_playing = True
                 self.bot_plays = algorithms.depth_first_search(self.game_state, self.goal_board)
 
             elif dls_rect.collidepoint(mouse_x, mouse_y):
                 # print("\n".join(str(amado) for amado in algorithms.depth_limited_search(self.game_state, self.goal_board, 8)))
-                self.bot_playing = True
                 self.bot_plays = algorithms.depth_limited_search(self.game_state, self.goal_board)
 
             elif ids_rect.collidepoint(mouse_x, mouse_y):
                 # print("\n".join(str(amado) for amado in algorithms.iterative_deepening_search(self.game_state, self.goal_board, 8)))
-                self.bot_playing = True
                 self.bot_plays = algorithms.iterative_deepening_search(self.game_state, self.goal_board)
 
             elif gs_rect.collidepoint(mouse_x, mouse_y):
                 # print("\n".join(str(amado) for amado in algorithms.greedy_search(self.game_state, self.goal_board)))
-                self.bot_playing = True
                 self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board)
 
 class MainMenu(BaseGameScreen):
