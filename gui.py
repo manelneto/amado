@@ -3,6 +3,7 @@ import algorithms
 import levels
 import pygame
 import sys
+import time
 
 class BaseGameScreen:
     def __init__(self, screen_width: int = 1200, screen_height: int = 750, change_state_callback=None):
@@ -52,6 +53,10 @@ class GUI(BaseGameScreen):
         self.level = level
         self.move_counter = 0
         self.goal_board = levels.GOALS[level]
+        # True if algorithm is running , False if player is playing
+        self.bot_playing = False
+        # List of plays to be made by the bot
+        self.bot_plays = []
 
     def draw_level_info(self):
         # draw the red line
@@ -76,24 +81,36 @@ class GUI(BaseGameScreen):
     def update(self) -> bool:
         new_game_state = self.game_state
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP or event.key == pygame.K_w:
-                    new_game_state = algorithms.up(self.game_state)
-                elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                    new_game_state = algorithms.down(self.game_state)
-                elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    new_game_state = algorithms.left(self.game_state)
-                elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                    new_game_state = algorithms.right(self.game_state)
-                elif event.key == pygame.K_ESCAPE:
-                    if self.change_state_callback:
-                        self.change_state_callback('menu')
+        if self.bot_playing:
+            if self.bot_plays:
+                new_game_state = self.bot_plays[0]
+                self.bot_plays.popleft()
+                time.sleep(1)
+            else:
+                self.bot_playing = False
+                # Exit game for now because there is no winning condition yet
+                pygame.quit()
+                sys.exit()
+                
+        else:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
                     return False
-                elif event.key == pygame.K_q:
-                    return False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP or event.key == pygame.K_w:
+                        new_game_state = algorithms.up(self.game_state)
+                    elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                        new_game_state = algorithms.down(self.game_state)
+                    elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                        new_game_state = algorithms.left(self.game_state)
+                    elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                        new_game_state = algorithms.right(self.game_state)
+                    elif event.key == pygame.K_ESCAPE:
+                        if self.change_state_callback:
+                            self.change_state_callback('menu')
+                        return False
+                    elif event.key == pygame.K_q:
+                        return False
             
         if new_game_state != self.game_state:
             self.game_state = new_game_state
@@ -123,7 +140,8 @@ class GUI(BaseGameScreen):
         top_y = 50
         self.draw_board(left_x, top_y, self.goal_board, scale)
 
-        self.draw_algorithms()
+        if not self.bot_playing:
+            self.draw_algorithms()
 
         # Draw extra info
         self.draw_level_info()
@@ -187,29 +205,29 @@ class GUI(BaseGameScreen):
 
         if mouse_click[0]: 
             if bfs_rect.collidepoint(mouse_x, mouse_y):
-                print("\n".join(str(amado) for amado in algorithms.breadth_first_search(self.game_state, self.goal_board)))
-                pygame.quit()
-                sys.exit()
+                # print("\n".join(str(amado) for amado in algorithms.breadth_first_search(self.game_state, self.goal_board)))
+                self.bot_playing = True
+                self.bot_plays = algorithms.breadth_first_search(self.game_state, self.goal_board)
 
             elif dfs_rect.collidepoint(mouse_x, mouse_y):
-                print("\n".join(str(amado) for amado in algorithms.depth_first_search(self.game_state, self.goal_board)))
-                pygame.quit()
-                sys.exit()
+                # print("\n".join(str(amado) for amado in algorithms.depth_first_search(self.game_state, self.goal_board)))
+                self.bot_playing = True
+                self.bot_plays = algorithms.depth_first_search(self.game_state, self.goal_board)
 
             elif dls_rect.collidepoint(mouse_x, mouse_y):
-                print("\n".join(str(amado) for amado in algorithms.depth_limited_search(self.game_state, self.goal_board, 8)))
-                pygame.quit()
-                sys.exit()
+                # print("\n".join(str(amado) for amado in algorithms.depth_limited_search(self.game_state, self.goal_board, 8)))
+                self.bot_playing = True
+                self.bot_plays = algorithms.depth_limited_search(self.game_state, self.goal_board)
 
             elif ids_rect.collidepoint(mouse_x, mouse_y):
-                print("\n".join(str(amado) for amado in algorithms.iterative_deepening_search(self.game_state, self.goal_board, 8)))
-                pygame.quit()
-                sys.exit()
+                # print("\n".join(str(amado) for amado in algorithms.iterative_deepening_search(self.game_state, self.goal_board, 8)))
+                self.bot_playing = True
+                self.bot_plays = algorithms.iterative_deepening_search(self.game_state, self.goal_board)
 
             elif gs_rect.collidepoint(mouse_x, mouse_y):
-                print("\n".join(str(amado) for amado in algorithms.greedy_search(self.game_state, self.goal_board)))
-                pygame.quit()
-                sys.exit()
+                # print("\n".join(str(amado) for amado in algorithms.greedy_search(self.game_state, self.goal_board)))
+                self.bot_playing = True
+                self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board)
 
 class MainMenu(BaseGameScreen):
     def __init__(self, change_state_callback):
