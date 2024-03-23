@@ -53,10 +53,17 @@ class GUI(BaseGameScreen):
         self.level = level
         self.move_counter = 0
         self.goal_board = levels.GOALS[level]
+        
         # True if algorithm is running , False if player is playing
         self.bot_playing = False
         # List of plays to be made by the bot
         self.bot_plays = []
+        # Index of current bot play
+        self.bot_play_index = 0
+        # Hash Map with buttons needed
+        self.button_rect = {}
+        # Either "algorithms" or "algorithm_menu"
+        self.current_menu = ""
 
     def draw_level_info(self):
         # draw the red line
@@ -79,53 +86,73 @@ class GUI(BaseGameScreen):
 
     def draw_algorithm_menu(self):
         mouse_x, mouse_y = pygame.mouse.get_pos()
-        mouse_click = pygame.mouse.get_pressed()
 
+        # Auto Run
         auto_run = pygame.font.SysFont('Arial', 25).render("Auto Run", True, (255, 255, 255))
         auto_run_pos = (self.screen_width * 0.83, self.screen_height * 0.8)
         auto_run_rect = auto_run.get_rect(topleft=auto_run_pos)
         self.screen.blit(auto_run, auto_run_pos)
+        self.button_rect["auto_run"] = auto_run_rect
         
         if auto_run_rect.collidepoint(mouse_x, mouse_y):
             auto_run = pygame.font.SysFont('Arial', 25).render("Auto Run", True, (57, 255, 20))
             self.screen.blit(auto_run, auto_run_pos)
 
+        # Exit Algorithm
         exit_button = pygame.font.SysFont('Arial', 25).render("Exit Algorithm", True, (255, 255, 255))
         exit_pos = (self.screen_width * 0.81, self.screen_height * 0.85)
         exit_rect = exit_button.get_rect(topleft=exit_pos)
         self.screen.blit(exit_button, exit_pos)
+        self.button_rect["exit_button"] = exit_rect
 
         if exit_rect.collidepoint(mouse_x, mouse_y):
             exit_button = pygame.font.SysFont('Arial', 25).render("Exit Algorithm", True, (255, 0, 0))
             self.screen.blit(exit_button, exit_pos)
 
-        # Chech for clicks
-        if mouse_click[0]: 
-            if auto_run_rect.collidepoint(mouse_x, mouse_y):
-                self.bot_playing = True
+        # Arrow right
+        arrow_right = pygame.font.SysFont('Arial', 50).render(">", True, (255, 255, 255))
+        arrow_right_pos = (self.screen_width * 0.87, self.screen_height * 0.70)
+        arrow_right_rect = arrow_right.get_rect(topleft=arrow_right_pos)
+        self.screen.blit(arrow_right, arrow_right_pos)
+        self.button_rect["arrow_right"] = arrow_right_rect
 
-            elif exit_rect.collidepoint(mouse_x, mouse_y):
-                self.bot_plays = []
+        if arrow_right_rect.collidepoint(mouse_x, mouse_y):
+            arrow_right = pygame.font.SysFont('Arial', 50).render(">", True, (57, 255, 20))
+            self.screen.blit(arrow_right, arrow_right_pos)
 
     # Should return False if the game loop should sto and True otherwise
     def update(self) -> bool:
+        mouse_x, mouse_y = pygame.mouse.get_pos()
         new_game_state = self.game_state
 
         if self.bot_playing:
-            if self.bot_plays:
-                new_game_state = self.bot_plays[0]
-                self.bot_plays.popleft()
+            if self.bot_play_index - 1 != len(self.bot_plays):
+                self.bot_play_index += 1
+                new_game_state = self.bot_plays[self.bot_play_index]
                 time.sleep(1)
             else:
                 self.bot_playing = False
+                self.bot_plays = []
                 # Exit game for now because there is no winning condition yet
                 pygame.quit()
                 sys.exit()
                 
         else:
             for event in pygame.event.get():
+
                 if event.type == pygame.QUIT:
                     return False
+                
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.current_menu == "algorithm_menu":
+                        if self.button_rect.get("auto_run") and self.button_rect["auto_run"].collidepoint(mouse_x, mouse_y):
+                            self.bot_playing = True
+                        elif self.button_rect.get("exit_button") and self.button_rect["exit_button"].collidepoint(mouse_x, mouse_y):
+                            self.bot_plays = []
+                        elif self.button_rect.get("arrow_right") and self.button_rect["arrow_right"].collidepoint(mouse_x, mouse_y):
+                            self.bot_play_index += 1
+                            new_game_state = self.bot_plays[self.bot_play_index]
+                    
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP or event.key == pygame.K_w:
                         new_game_state = algorithms.up(self.game_state)
@@ -141,7 +168,7 @@ class GUI(BaseGameScreen):
                         return False
                     elif event.key == pygame.K_q:
                         return False
-            
+
         if new_game_state != self.game_state:
             self.game_state = new_game_state
             self.move_counter += 1
@@ -172,8 +199,10 @@ class GUI(BaseGameScreen):
 
         # Check if algorithm was selected
         if not self.bot_plays:
+            self.current_menu = "algorithms"
             self.draw_algorithms()
         else:
+            self.current_menu = "algorithm_menu"
             self.draw_algorithm_menu()
 
         # Draw extra info
