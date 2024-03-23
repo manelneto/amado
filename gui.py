@@ -85,15 +85,27 @@ class GUI(BaseGameScreen):
         auto_run_pos = (self.screen_width * 0.83, self.screen_height * 0.8)
         auto_run_rect = auto_run.get_rect(topleft=auto_run_pos)
         self.screen.blit(auto_run, auto_run_pos)
-
+        
         if auto_run_rect.collidepoint(mouse_x, mouse_y):
             auto_run = pygame.font.SysFont('Arial', 25).render("Auto Run", True, (57, 255, 20))
             self.screen.blit(auto_run, auto_run_pos)
 
+        exit_button = pygame.font.SysFont('Arial', 25).render("Exit Algorithm", True, (255, 255, 255))
+        exit_pos = (self.screen_width * 0.81, self.screen_height * 0.85)
+        exit_rect = exit_button.get_rect(topleft=exit_pos)
+        self.screen.blit(exit_button, exit_pos)
+
+        if exit_rect.collidepoint(mouse_x, mouse_y):
+            exit_button = pygame.font.SysFont('Arial', 25).render("Exit Algorithm", True, (255, 0, 0))
+            self.screen.blit(exit_button, exit_pos)
+
+        # Chech for clicks
         if mouse_click[0]: 
             if auto_run_rect.collidepoint(mouse_x, mouse_y):
                 self.bot_playing = True
 
+            elif exit_rect.collidepoint(mouse_x, mouse_y):
+                self.bot_plays = []
 
     # Should return False if the game loop should sto and True otherwise
     def update(self) -> bool:
