@@ -77,6 +77,24 @@ class GUI(BaseGameScreen):
         counter_position = (10, self.screen_height - 30)
         self.screen.blit(counter_surface, counter_position)
 
+    def draw_algorithm_menu(self):
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        mouse_click = pygame.mouse.get_pressed()
+
+        auto_run = pygame.font.SysFont('Arial', 25).render("Auto Run", True, (255, 255, 255))
+        auto_run_pos = (self.screen_width * 0.83, self.screen_height * 0.8)
+        auto_run_rect = auto_run.get_rect(topleft=auto_run_pos)
+        self.screen.blit(auto_run, auto_run_pos)
+
+        if auto_run_rect.collidepoint(mouse_x, mouse_y):
+            auto_run = pygame.font.SysFont('Arial', 25).render("Auto Run", True, (57, 255, 20))
+            self.screen.blit(auto_run, auto_run_pos)
+
+        if mouse_click[0]: 
+            if auto_run_rect.collidepoint(mouse_x, mouse_y):
+                self.bot_playing = True
+
+
     # Should return False if the game loop should sto and True otherwise
     def update(self) -> bool:
         new_game_state = self.game_state
@@ -140,8 +158,11 @@ class GUI(BaseGameScreen):
         top_y = 50
         self.draw_board(left_x, top_y, self.goal_board, scale)
 
-        if not self.bot_playing:
+        # Check if algorithm was selected
+        if not self.bot_plays:
             self.draw_algorithms()
+        else:
+            self.draw_algorithm_menu()
 
         # Draw extra info
         self.draw_level_info()
@@ -206,7 +227,7 @@ class GUI(BaseGameScreen):
         if mouse_click[0]: 
             if bfs_rect.collidepoint(mouse_x, mouse_y):
                 # print("\n".join(str(amado) for amado in algorithms.breadth_first_search(self.game_state, self.goal_board)))
-                self.bot_playing = True
+                # self.bot_playing = True
                 self.bot_plays = algorithms.breadth_first_search(self.game_state, self.goal_board)
 
             elif dfs_rect.collidepoint(mouse_x, mouse_y):
