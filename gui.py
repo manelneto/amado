@@ -111,7 +111,7 @@ class GUI(BaseGameScreen):
 
         # Arrow right
         arrow_right = pygame.font.SysFont('Arial', 50).render(">", True, (255, 255, 255))
-        arrow_right_pos = (self.screen_width * 0.87, self.screen_height * 0.70)
+        arrow_right_pos = (self.screen_width * 0.90, self.screen_height * 0.70)
         arrow_right_rect = arrow_right.get_rect(topleft=arrow_right_pos)
         self.screen.blit(arrow_right, arrow_right_pos)
         self.button_rect["arrow_right"] = arrow_right_rect
@@ -119,6 +119,17 @@ class GUI(BaseGameScreen):
         if arrow_right_rect.collidepoint(mouse_x, mouse_y):
             arrow_right = pygame.font.SysFont('Arial', 50).render(">", True, (57, 255, 20))
             self.screen.blit(arrow_right, arrow_right_pos)
+
+        # Arrow left
+        arrow_left = pygame.font.SysFont('Arial', 50).render("<", True, (255, 255, 255))
+        arrow_left_pos = (self.screen_width * 0.82, self.screen_height * 0.70)
+        arrow_left_rect = arrow_left.get_rect(topleft=arrow_left_pos)
+        self.screen.blit(arrow_left, arrow_left_pos)
+        self.button_rect["arrow_left"] = arrow_left_rect
+
+        if arrow_left_rect.collidepoint(mouse_x, mouse_y):
+            arrow_left = pygame.font.SysFont('Arial', 50).render("<", True, (57, 255, 20))
+            self.screen.blit(arrow_left, arrow_left_pos)
 
     # Should return False if the game loop should sto and True otherwise
     def update(self) -> bool:
@@ -151,6 +162,10 @@ class GUI(BaseGameScreen):
                             self.bot_plays = []
                         elif self.button_rect.get("arrow_right") and self.button_rect["arrow_right"].collidepoint(mouse_x, mouse_y):
                             self.bot_play_index += 1
+                            new_game_state = self.bot_plays[self.bot_play_index]
+                        elif self.move_counter > 0 and self.button_rect.get("arrow_left") and self.button_rect["arrow_left"].collidepoint(mouse_x, mouse_y):
+                            self.bot_play_index -= 1
+                            self.move_counter -= 2 # because 1 is added by default at end
                             new_game_state = self.bot_plays[self.bot_play_index]
                     
                 elif event.type == pygame.KEYDOWN:
