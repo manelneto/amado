@@ -13,7 +13,7 @@ class Amado:
                     break
 
     def __hash__(self):
-        return hash(((tuple(l) for l in self.board), self.row, self.col))
+        return hash(self.__str__())
 
     def __eq__(self, other):
         if isinstance(self, other.__class__):

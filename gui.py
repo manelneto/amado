@@ -175,6 +175,16 @@ class GUI(BaseGameScreen):
             ids_surface = pygame.font.SysFont('Arial', 25).render("Iterative Deepening Search", True, (57, 255, 20))
             self.screen.blit(ids_surface, ids_position)
 
+        # draw GS below current level
+        gs_surface = pygame.font.SysFont('Arial', 25).render("Greedy Search", True, (255, 255, 255))
+        gs_position = (930, 450)
+        gs_rect = gs_surface.get_rect(topleft=gs_position)
+        self.screen.blit(gs_surface, gs_position)
+
+        if gs_rect.collidepoint(mouse_x, mouse_y):
+            gs_surface = pygame.font.SysFont('Arial', 25).render("Greedy Search", True, (57, 255, 20))
+            self.screen.blit(gs_surface, gs_position)
+
         if mouse_click[0]: 
             if bfs_rect.collidepoint(mouse_x, mouse_y):
                 print("\n".join(str(amado) for amado in algorithms.breadth_first_search(self.game_state, self.goal_board)))
@@ -193,6 +203,11 @@ class GUI(BaseGameScreen):
 
             elif ids_rect.collidepoint(mouse_x, mouse_y):
                 print("\n".join(str(amado) for amado in algorithms.iterative_deepening_search(self.game_state, self.goal_board, 8)))
+                pygame.quit()
+                sys.exit()
+
+            elif gs_rect.collidepoint(mouse_x, mouse_y):
+                print("\n".join(str(amado) for amado in algorithms.greedy_search(self.game_state, self.goal_board)))
                 pygame.quit()
                 sys.exit()
 

@@ -10,13 +10,13 @@ def goal_test(game_state: Amado, goal_board: list) -> bool:
 # Operators
 
 def move(game_state: Amado, row: int, col: int) -> Amado:
-    current_state = deepcopy(game_state)
-    if (current_state.can_move(row, col)):
-        color1 = current_state.color(current_state.row, current_state.col)
-        color2 = current_state.color(row, col)
+    if game_state.can_move(row, col):
+        color1 = game_state.color(game_state.row, game_state.col)
+        color2 = game_state.color(row, col)
+        board = deepcopy(game_state.board)
         if color1 != color2:
-            current_state.board[row][col] = current_state.swap(color1, color2)
-        return Amado(current_state.board, row, col)
+            board[row][col] = game_state.swap(color1, color2)
+        return Amado(board, row, col)
     else:
         return game_state
 
@@ -69,7 +69,7 @@ def breadth_first_search(initial_state: Amado, goal_board: list):
     root = TreeNode(initial_state)
     queue = deque([root])
     visited_states = set([initial_state])
-    
+
     while queue:
         node = queue.popleft()
 
@@ -109,7 +109,7 @@ def depth_limited_search(initial_state: Amado, goal_board: list, depth_limit: in
     root = TreeNode(initial_state)
     queue = deque([root])
     visited_states = set([initial_state])
-    
+
     while queue:
         node = queue.popleft()
 
@@ -124,7 +124,8 @@ def depth_limited_search(initial_state: Amado, goal_board: list, depth_limit: in
                 new_node = TreeNode(state, node)
                 node.add_child(new_node)
                 queue.appendleft(new_node)
-                
+                visited_states.add(state)
+
     return None
 
 def iterative_deepening_search(initial_state: Amado, goal_board: list, depth_limit: int):
@@ -132,6 +133,30 @@ def iterative_deepening_search(initial_state: Amado, goal_board: list, depth_lim
         result = depth_limited_search(initial_state, goal_board, i)
         if result:
             return result
+    return None
+
+def greedy_search(initial_state: Amado, goal_board: list):
+    root = TreeNode(initial_state)
+    queue = deque([(root, heuristic(initial_state, goal_board))])
+    visited_states = set([initial_state])
+
+    while queue:
+        node, value = queue.popleft()
+
+        if goal_test(node.game_state, goal_board):
+            return get_solution(node)
+        
+        child_states = [(state, heuristic(state, goal_board)) for state in child_game_states(node.game_state)]
+
+        for (state, evaluation) in child_states:
+            if state not in visited_states:
+                new_node = TreeNode(state, node)
+                node.add_child(new_node)
+                queue.append((new_node, evaluation))
+                visited_states.add(state)
+        
+        queue = deque(sorted(queue, key = lambda node: node[1]))
+        
     return None
 
 def get_solution(node: TreeNode):
