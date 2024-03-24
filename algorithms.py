@@ -162,16 +162,28 @@ def greedy_search(initial_state: Amado, goal_board: list):
 def get_solution(node: TreeNode):
     print("WINNER!")
     solution = deque([node.game_state])
+    i = 0
     while node.parent:
+        i += 1
         solution.appendleft(node.parent.game_state)
         node = node.parent
+    print(i)
     return solution
 
 def heuristic(game_state: Amado, goal_board: list):
     # MINIMIZAR
     different_squares = 0
+    distances = []
+
     for row in range(game_state.board_size):
         for col in range(game_state.board_size):
             if game_state.board[row][col] != goal_board[row][col]:
                 different_squares += 1
-    return different_squares
+                distance = abs(game_state.row - row) + abs(game_state.col - col)
+                distances.append(distance)
+
+    average = 0
+    if distances:
+        average = sum(distances)/len(distances)
+
+    return different_squares + average
