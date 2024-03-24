@@ -241,64 +241,33 @@ class GUI(BaseGameScreen):
         # Update the screen
         pygame.display.flip()
 
-    def draw_algorithms(self):
+    def draw_algorithm_button(self, algo, position):
         mouse_x, mouse_y = pygame.mouse.get_pos()
-        mouse_click = pygame.mouse.get_pressed()
+        # Default color and hover color
+        default_color = (255, 255, 255)
+        hover_color = (57, 255, 20)
+        
+        algo_surface = pygame.font.SysFont('Arial', 25).render(algo['name'], True, default_color)
+        algo_rect = algo_surface.get_rect(topleft=position)
+        
+        # If mouse hovers over the button, change the color
+        if algo_rect.collidepoint(mouse_x, mouse_y):
+            algo_surface = pygame.font.SysFont('Arial', 25).render(algo['name'], True, hover_color)
+        
+        self.screen.blit(algo_surface, position)
+        self.button_rect[algo['key']] = algo_rect  # Store the button rect for click detection
 
-        # draw BFS below current level
-        bfs_surface = pygame.font.SysFont('Arial', 25).render("Breadth First Search", True, (255, 255, 255))
-        bfs_position = (930, 250)
-        bfs_rect = bfs_surface.get_rect(topleft=bfs_position)
-        self.screen.blit(bfs_surface, bfs_position)
-        self.button_rect["bfs"] = bfs_rect
-
-        if bfs_rect.collidepoint(mouse_x, mouse_y):
-            bfs_surface = pygame.font.SysFont('Arial', 25).render("Breadth First Search", True, (57, 255, 20))
-            self.screen.blit(bfs_surface, bfs_position)
-
-        # draw DFS below current level
-        dfs_surface = pygame.font.SysFont('Arial', 25).render("Depth First Search", True, (255, 255, 255))
-        dfs_position = (930, 300)
-        dfs_rect = dfs_surface.get_rect(topleft=dfs_position)
-        self.screen.blit(dfs_surface, dfs_position)
-        self.button_rect["dfs"] = dfs_rect
-
-        if dfs_rect.collidepoint(mouse_x, mouse_y):
-            dfs_surface = pygame.font.SysFont('Arial', 25).render("Depth First Search", True, (57, 255, 20))
-            self.screen.blit(dfs_surface, dfs_position)
-
-        # draw DLS below current level
-        dls_surface = pygame.font.SysFont('Arial', 25).render("Depth Limited Search", True, (255, 255, 255))
-        dls_position = (930, 350)
-        dls_rect = dls_surface.get_rect(topleft=dls_position)
-        self.screen.blit(dls_surface, dls_position)
-        self.button_rect["dls"] = dls_rect
-
-        if dls_rect.collidepoint(mouse_x, mouse_y):
-            dls_surface = pygame.font.SysFont('Arial', 25).render("Depth Limited Search", True, (57, 255, 20))
-            self.screen.blit(dls_surface, dls_position)
-
-        # draw IDS below current level
-        ids_surface = pygame.font.SysFont('Arial', 25).render("Iterative Deepening Search", True, (255, 255, 255))
-        ids_position = (930, 400)
-        ids_rect = ids_surface.get_rect(topleft=ids_position)
-        self.screen.blit(ids_surface, ids_position)
-        self.button_rect["ids"] = ids_rect
-
-        if ids_rect.collidepoint(mouse_x, mouse_y):
-            ids_surface = pygame.font.SysFont('Arial', 25).render("Iterative Deepening Search", True, (57, 255, 20))
-            self.screen.blit(ids_surface, ids_position)
-
-        # draw GS below current level
-        gs_surface = pygame.font.SysFont('Arial', 25).render("Greedy Search", True, (255, 255, 255))
-        gs_position = (930, 450)
-        gs_rect = gs_surface.get_rect(topleft=gs_position)
-        self.screen.blit(gs_surface, gs_position)
-        self.button_rect["gs"] = gs_rect
-
-        if gs_rect.collidepoint(mouse_x, mouse_y):
-            gs_surface = pygame.font.SysFont('Arial', 25).render("Greedy Search", True, (57, 255, 20))
-            self.screen.blit(gs_surface, gs_position)
+    def draw_algorithms(self):
+        algorithms = [
+            {"name": "Breadth First Search", "key": "bfs", "position": (930, 250)},
+            {"name": "Depth First Search", "key": "dfs", "position": (930, 300)},
+            {"name": "Depth Limited Search", "key": "dls", "position": (930, 350)},
+            {"name": "Iterative Deepening Search", "key": "ids", "position": (930, 400)},
+            {"name": "Greedy Search", "key": "gs", "position": (930, 450)},
+        ]
+        
+        for algo in algorithms:
+            self.draw_algorithm_button(algo, algo['position'])
 
 class MainMenu(BaseGameScreen):
     def __init__(self, change_state_callback):
