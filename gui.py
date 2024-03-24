@@ -188,6 +188,9 @@ class GUI(BaseGameScreen):
             self.game_state = new_game_state
             self.move_counter += 1
 
+        if algorithms.goal_test(self.game_state, self.goal_board):
+            self.change_state_callback('win')
+
         return True
 
     def render(self):
@@ -392,4 +395,31 @@ class MainMenu(BaseGameScreen):
     def render(self):
         self.screen.fill(self.background_color)
         self.draw_main_menu()
+        pygame.display.flip()
+
+class WinMenu(BaseGameScreen):
+    def __init__(self, game_state: Amado, change_state_callback):
+        super().__init__()
+        self.change_state_callback = change_state_callback
+
+    def draw_win_menu(self):
+        pass
+
+    def update(self) -> bool:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return False
+            # if user presses key, go back to main menu
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    self.change_state_callback('menu')
+                    return False
+                elif event.key == pygame.K_q:
+                    return False
+
+        return True
+    
+    def render(self):
+        self.screen.fill(self.background_color)
+        self.draw_win_menu()
         pygame.display.flip()
