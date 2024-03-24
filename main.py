@@ -3,6 +3,8 @@ from gui import GUI
 from gui import MainMenu
 from gui import WinMenu
 import levels
+import pygame
+import sys
 
 def change_state(new_state, level=0, state=None):
     if new_state == "menu":
@@ -14,6 +16,10 @@ def change_state(new_state, level=0, state=None):
         current_screen = WinMenu(state, change_state_callback=change_state)
     while current_screen.update():
         current_screen.render()
+
+    # Ensure exit
+    pygame.quit()
+    sys.exit()
 
 if __name__ == "__main__":
     change_state("menu")

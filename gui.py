@@ -413,7 +413,6 @@ class WinMenu(BaseGameScreen):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     self.change_state_callback('menu')
-                    return False
                 elif event.key == pygame.K_q:
                     return False
 
