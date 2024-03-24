@@ -189,7 +189,7 @@ class GUI(BaseGameScreen):
             self.move_counter += 1
 
         if algorithms.goal_test(self.game_state, self.goal_board):
-            self.change_state_callback('win')
+            self.change_state_callback('win', self.level, self.move_counter)
 
         return True
 
@@ -398,12 +398,27 @@ class MainMenu(BaseGameScreen):
         pygame.display.flip()
 
 class WinMenu(BaseGameScreen):
-    def __init__(self, game_state: Amado, change_state_callback):
+    def __init__(self, level: int, score: int, change_state_callback):
         super().__init__()
         self.change_state_callback = change_state_callback
+        self.level = level
+        self.score = score
 
     def draw_win_menu(self):
-        pass
+        # Level X Completed
+        level_completed = pygame.font.SysFont('Arial', 75).render(f"Level {self.level} Completed!", True, (57, 255, 20))
+        level_completed_pos = (self.screen_width / 2 - level_completed.get_width() / 2, 150)
+        self.screen.blit(level_completed, level_completed_pos)
+
+        # Score = X
+        score_text = pygame.font.SysFont('Arial', 50).render(f"Score = {self.score} ", True, (255, 255, 255))
+        score_text_pos = (self.screen_width / 2 - score_text.get_width() / 2, 300)
+        self.screen.blit(score_text, score_text_pos)
+
+        # draw "ESC to get back"
+        counter_surface = pygame.font.SysFont('Arial', 25).render("Press ESC for Menu" , True, (255, 255, 255))
+        counter_position = (10, self.screen_height - 30)
+        self.screen.blit(counter_surface, counter_position)
 
     def update(self) -> bool:
         for event in pygame.event.get():
@@ -411,7 +426,7 @@ class WinMenu(BaseGameScreen):
                 return False
             # if user presses key, go back to main menu
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
+                if event.key == pygame.K_RETURN or event.key == pygame.K_ESCAPE:
                     self.change_state_callback('menu')
                 elif event.key == pygame.K_q:
                     return False
