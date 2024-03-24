@@ -167,6 +167,18 @@ class GUI(BaseGameScreen):
                             self.bot_play_index -= 1
                             self.move_counter -= 2 # because 1 is added by default at end
                             new_game_state = self.bot_plays[self.bot_play_index]
+                    else:
+                        # select the algorithm
+                        if self.button_rect.get("bfs") and self.button_rect["bfs"].collidepoint(mouse_x, mouse_y):
+                            self.bot_plays = algorithms.breadth_first_search(self.game_state, self.goal_board)
+                        elif self.button_rect.get("dfs") and self.button_rect["dfs"].collidepoint(mouse_x, mouse_y):
+                            self.bot_plays = algorithms.depth_first_search(self.game_state, self.goal_board)
+                        elif self.button_rect.get("dls") and self.button_rect["dls"].collidepoint(mouse_x, mouse_y):
+                            self.bot_plays = algorithms.depth_limited_search(self.game_state, self.goal_board)
+                        elif self.button_rect.get("ids") and self.button_rect["ids"].collidepoint(mouse_x, mouse_y):
+                            self.bot_plays = algorithms.iterative_deepening_search(self.game_state, self.goal_board)
+                        elif self.button_rect.get("gs") and self.button_rect["gs"].collidepoint(mouse_x, mouse_y):
+                            self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board)
                     
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP or event.key == pygame.K_w:
@@ -238,6 +250,7 @@ class GUI(BaseGameScreen):
         bfs_position = (930, 250)
         bfs_rect = bfs_surface.get_rect(topleft=bfs_position)
         self.screen.blit(bfs_surface, bfs_position)
+        self.button_rect["bfs"] = bfs_rect
 
         if bfs_rect.collidepoint(mouse_x, mouse_y):
             bfs_surface = pygame.font.SysFont('Arial', 25).render("Breadth First Search", True, (57, 255, 20))
@@ -248,6 +261,7 @@ class GUI(BaseGameScreen):
         dfs_position = (930, 300)
         dfs_rect = dfs_surface.get_rect(topleft=dfs_position)
         self.screen.blit(dfs_surface, dfs_position)
+        self.button_rect["dfs"] = dfs_rect
 
         if dfs_rect.collidepoint(mouse_x, mouse_y):
             dfs_surface = pygame.font.SysFont('Arial', 25).render("Depth First Search", True, (57, 255, 20))
@@ -258,6 +272,7 @@ class GUI(BaseGameScreen):
         dls_position = (930, 350)
         dls_rect = dls_surface.get_rect(topleft=dls_position)
         self.screen.blit(dls_surface, dls_position)
+        self.button_rect["dls"] = dls_rect
 
         if dls_rect.collidepoint(mouse_x, mouse_y):
             dls_surface = pygame.font.SysFont('Arial', 25).render("Depth Limited Search", True, (57, 255, 20))
@@ -268,6 +283,7 @@ class GUI(BaseGameScreen):
         ids_position = (930, 400)
         ids_rect = ids_surface.get_rect(topleft=ids_position)
         self.screen.blit(ids_surface, ids_position)
+        self.button_rect["ids"] = ids_rect
 
         if ids_rect.collidepoint(mouse_x, mouse_y):
             ids_surface = pygame.font.SysFont('Arial', 25).render("Iterative Deepening Search", True, (57, 255, 20))
@@ -278,31 +294,11 @@ class GUI(BaseGameScreen):
         gs_position = (930, 450)
         gs_rect = gs_surface.get_rect(topleft=gs_position)
         self.screen.blit(gs_surface, gs_position)
+        self.button_rect["gs"] = gs_rect
 
         if gs_rect.collidepoint(mouse_x, mouse_y):
             gs_surface = pygame.font.SysFont('Arial', 25).render("Greedy Search", True, (57, 255, 20))
             self.screen.blit(gs_surface, gs_position)
-
-        if mouse_click[0]: 
-            if bfs_rect.collidepoint(mouse_x, mouse_y):
-                # print("\n".join(str(amado) for amado in algorithms.breadth_first_search(self.game_state, self.goal_board)))
-                self.bot_plays = algorithms.breadth_first_search(self.game_state, self.goal_board)
-
-            elif dfs_rect.collidepoint(mouse_x, mouse_y):
-                # print("\n".join(str(amado) for amado in algorithms.depth_first_search(self.game_state, self.goal_board)))
-                self.bot_plays = algorithms.depth_first_search(self.game_state, self.goal_board)
-
-            elif dls_rect.collidepoint(mouse_x, mouse_y):
-                # print("\n".join(str(amado) for amado in algorithms.depth_limited_search(self.game_state, self.goal_board, 8)))
-                self.bot_plays = algorithms.depth_limited_search(self.game_state, self.goal_board)
-
-            elif ids_rect.collidepoint(mouse_x, mouse_y):
-                # print("\n".join(str(amado) for amado in algorithms.iterative_deepening_search(self.game_state, self.goal_board, 8)))
-                self.bot_plays = algorithms.iterative_deepening_search(self.game_state, self.goal_board)
-
-            elif gs_rect.collidepoint(mouse_x, mouse_y):
-                # print("\n".join(str(amado) for amado in algorithms.greedy_search(self.game_state, self.goal_board)))
-                self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board)
 
 class MainMenu(BaseGameScreen):
     def __init__(self, change_state_callback):
