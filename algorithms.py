@@ -54,11 +54,13 @@ def child_game_states(game_state: Amado) -> list:
     return new_states
 
 class TreeNode:
-    def __init__(self, game_state: Amado, parent=None):
+    def __init__(self, game_state: Amado, parent=None, g_cost=0):
         self.game_state = game_state
         self.parent = parent
         self.children = []
         self.depth = 0
+        self.g_cost = g_cost  # Cost from start node to this node
+        self.f_cost = 0  # Total cost (g_cost + heuristic)
 
     def add_child(self, child_node):
         self.children.append(child_node)
@@ -157,6 +159,32 @@ def greedy_search(initial_state: Amado, goal_board: list):
         
         queue = deque(sorted(queue, key = lambda node: node[1]))
         
+    return None
+
+def a_star(initial_state: Amado, goal_board: list):
+    root = TreeNode(initial_state)
+    root.f_cost = heuristic(initial_state, goal_board)
+    open_list = deque([root])
+    visited_states = set([initial_state])
+
+    while open_list:
+        # Sort open_list based on f_cost to ensure we're expanding the most promising node next
+        open_list = deque(sorted(open_list, key=lambda node: node.f_cost))
+        current_node = open_list.popleft()
+
+        if goal_test(current_node.game_state, goal_board):
+            return get_solution(current_node)
+
+        for child_state in child_game_states(current_node.game_state):
+            if child_state not in visited_states:
+                g_cost = current_node.g_cost + 1 # each move has cost 1
+                child_node = TreeNode(child_state, current_node, g_cost)
+                child_node.f_cost = g_cost + heuristic(child_state, goal_board)
+
+                current_node.add_child(child_node)
+                open_list.append(child_node)
+                visited_states.add(child_state)
+
     return None
 
 def get_solution(node: TreeNode):
