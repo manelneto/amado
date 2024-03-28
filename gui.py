@@ -179,6 +179,8 @@ class GUI(BaseGameScreen):
                             self.bot_plays = algorithms.iterative_deepening_search(self.game_state, self.goal_board)
                         elif self.button_rect.get("gs") and self.button_rect["gs"].collidepoint(mouse_x, mouse_y):
                             self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board)
+                        elif self.button_rect.get("astar") and self.button_rect["astar"].collidepoint(mouse_x, mouse_y):
+                            self.bot_plays = algorithms.a_star(self.game_state, self.goal_board)
                     
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP or event.key == pygame.K_w:
@@ -264,6 +266,7 @@ class GUI(BaseGameScreen):
             {"name": "Depth Limited Search", "key": "dls", "position": (930, 350)},
             {"name": "Iterative Deepening Search", "key": "ids", "position": (930, 400)},
             {"name": "Greedy Search", "key": "gs", "position": (930, 450)},
+            {"name": "A*", "key": "astar", "position": (930, 500)}
         ]
         
         for algo in algorithms:
