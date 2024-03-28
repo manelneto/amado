@@ -50,6 +50,8 @@ class GUI(BaseGameScreen):
         self.level = level
         self.move_counter = 0
         self.goal_board = levels.GOALS[level]
+        self.hint_message = None
+        self.hint_timer = None
         
         self.bot_playing = False
         self.bot_plays = []
@@ -65,6 +67,29 @@ class GUI(BaseGameScreen):
             {"name": "Greedy Search", "key": "gs", "position": (930, 450)},
             {"name": "A*", "key": "astar", "position": (930, 500)}
         ]
+
+    def show_hint(self):
+        hint_path = algorithms.greedy_search(self.game_state, self.goal_board)
+        self.hint_timer = pygame.time.get_ticks() + 5000
+        if hint_path and len(hint_path) > 1:
+            next_state = hint_path[1] 
+            direction = self.determine_direction(self.game_state, next_state)
+            self.hint_message = f"Go {direction}"
+        else:
+            self.hint_message = "Any valid hint"
+
+    def determine_direction(self, current_state, next_state):
+        row_diff = next_state.row - current_state.row
+        col_diff = next_state.col - current_state.col
+        if row_diff == -1:
+            return "up"
+        elif row_diff == 1:
+            return "down"
+        elif col_diff == -1:
+            return "left"
+        elif col_diff == 1:
+            return "right"
+        return "any valid direction"
 
     def draw_algorithm_menu(self):
         self.algorithm_menu = True
@@ -172,6 +197,13 @@ class GUI(BaseGameScreen):
         
         else:
             for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.button_rect["hint"].collidepoint(event.pos):
+                        self.show_hint()
+                if self.hint_timer and pygame.time.get_ticks() > self.hint_timer:
+                    self.hint_message = None
+                    self.hint_timer = None
+
                 if event.type == pygame.QUIT:
                     return False
                 
@@ -252,6 +284,19 @@ class GUI(BaseGameScreen):
             self.draw_algorithm_menu()
         else:
             self.draw_algorithms()
+            hint_font = pygame.font.SysFont('Arial', 25)  
+            hint_button_text = hint_font.render("Hint", True, (57, 255, 20))
+            hint_button_width, hint_button_height = hint_button_text.get_size()
+
+            hint_button_pos = (self.screen_width / 2 + 430, self.screen_height - hint_button_height - 50)
+            self.screen.blit(hint_button_text, hint_button_pos)
+
+            self.button_rect["hint"] = pygame.Rect(hint_button_pos[0], hint_button_pos[1], hint_button_width, hint_button_height)
+
+            if self.hint_message:
+                hint_msg_pos = (self.screen_width / 2 + 415, self.screen_height - hint_button_height - 20)
+                hint_msg_surface = hint_font.render(self.hint_message, True, (255, 255, 255))
+                self.screen.blit(hint_msg_surface, hint_msg_pos)
 
         # Level Info
         self.draw_level_info()
