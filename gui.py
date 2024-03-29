@@ -50,8 +50,8 @@ class GUI(BaseGameScreen):
         self.level = level
         self.move_counter = 0
         self.goal_board = levels.GOALS[level]
+        
         self.hint_message = None
-        self.hint_timer = None
         
         self.bot_playing = False
         self.bot_plays = []
@@ -65,20 +65,17 @@ class GUI(BaseGameScreen):
             {"name": "Depth Limited Search", "key": "dls", "position": (930, 350)},
             {"name": "Iterative Deepening Search", "key": "ids", "position": (930, 400)},
             {"name": "Greedy Search", "key": "gs", "position": (930, 450)},
-            {"name": "A*", "key": "astar", "position": (930, 500)}
+            {"name": "A* Search", "key": "astar", "position": (930, 500)}
         ]
 
     def show_hint(self):
         hint_path = algorithms.greedy_search(self.game_state, self.goal_board)
-        self.hint_timer = pygame.time.get_ticks() + 5000
         if hint_path and len(hint_path) > 1:
             next_state = hint_path[1] 
             direction = self.determine_direction(self.game_state, next_state)
             self.hint_message = f"Go {direction}"
-        else:
-            self.hint_message = "Any valid hint"
 
-    def determine_direction(self, current_state, next_state):
+    def determine_direction(self, current_state: Amado, next_state: Amado):
         row_diff = next_state.row - current_state.row
         col_diff = next_state.col - current_state.col
         if row_diff == -1:
@@ -98,7 +95,7 @@ class GUI(BaseGameScreen):
         # Auto Run
         auto_run = pygame.font.SysFont('Arial', 25).render("Auto Run", True, (255, 255, 255))
         auto_run_pos = (self.screen_width * 0.83, self.screen_height * 0.8)
-        auto_run_rect = auto_run.get_rect(topleft=auto_run_pos)
+        auto_run_rect = auto_run.get_rect(topleft = auto_run_pos)
         self.screen.blit(auto_run, auto_run_pos)
         self.button_rect["auto_run"] = auto_run_rect
         
@@ -109,7 +106,7 @@ class GUI(BaseGameScreen):
         # Exit Algorithm
         exit_button = pygame.font.SysFont('Arial', 25).render("Exit Algorithm", True, (255, 255, 255))
         exit_pos = (self.screen_width * 0.81, self.screen_height * 0.85)
-        exit_rect = exit_button.get_rect(topleft=exit_pos)
+        exit_rect = exit_button.get_rect(topleft = exit_pos)
         self.screen.blit(exit_button, exit_pos)
         self.button_rect["exit_button"] = exit_rect
 
@@ -120,7 +117,7 @@ class GUI(BaseGameScreen):
         # Right Arrow
         arrow_right = pygame.font.SysFont('Arial', 50).render(">", True, (255, 255, 255))
         arrow_right_pos = (self.screen_width * 0.90, self.screen_height * 0.70)
-        arrow_right_rect = arrow_right.get_rect(topleft=arrow_right_pos)
+        arrow_right_rect = arrow_right.get_rect(topleft = arrow_right_pos)
         self.screen.blit(arrow_right, arrow_right_pos)
         self.button_rect["arrow_right"] = arrow_right_rect
 
@@ -131,7 +128,7 @@ class GUI(BaseGameScreen):
         # Left Arrow
         arrow_left = pygame.font.SysFont('Arial', 50).render("<", True, (255, 255, 255))
         arrow_left_pos = (self.screen_width * 0.82, self.screen_height * 0.70)
-        arrow_left_rect = arrow_left.get_rect(topleft=arrow_left_pos)
+        arrow_left_rect = arrow_left.get_rect(topleft = arrow_left_pos)
         self.screen.blit(arrow_left, arrow_left_pos)
         self.button_rect["arrow_left"] = arrow_left_rect
 
@@ -144,6 +141,26 @@ class GUI(BaseGameScreen):
         
         for algorithm in self.algorithms:
             self.draw_algorithm_button(algorithm, algorithm['position'])
+
+    def draw_hint(self):
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+
+        hint_font = pygame.font.SysFont('Arial', 25)
+        hint_button = hint_font.render("Hint", True, (255, 255, 255))
+        hint_button_width, hint_button_height = hint_button.get_size()
+        hint_button_pos = (self.screen_width / 2 + 430, self.screen_height - hint_button_height - 50)
+        hint_button_rect = hint_button.get_rect(topleft = hint_button_pos)
+        self.screen.blit(hint_button, hint_button_pos)
+        self.button_rect["hint"] = hint_button_rect
+
+        if hint_button_rect.collidepoint(mouse_x, mouse_y):
+            hint_button = hint_font.render("Hint", True, (57, 255, 20))
+            self.screen.blit(hint_button, hint_button_pos)
+
+        if self.hint_message:
+            hint_msg_pos = (self.screen_width / 2 + 415, self.screen_height - hint_button_height - 20)
+            hint_msg_surface = hint_font.render(self.hint_message, True, (255, 255, 255))
+            self.screen.blit(hint_msg_surface, hint_msg_pos)
 
     def draw_algorithm_button(self, algorithm: dict, position: tuple):
         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -197,13 +214,6 @@ class GUI(BaseGameScreen):
         
         else:
             for event in pygame.event.get():
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.button_rect["hint"].collidepoint(event.pos):
-                        self.show_hint()
-                if self.hint_timer and pygame.time.get_ticks() > self.hint_timer:
-                    self.hint_message = None
-                    self.hint_timer = None
-
                 if event.type == pygame.QUIT:
                     return False
                 
@@ -234,6 +244,8 @@ class GUI(BaseGameScreen):
                             self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board)
                         elif self.button_rect.get("astar") and self.button_rect["astar"].collidepoint(mouse_x, mouse_y):
                             self.bot_plays = algorithms.a_star(self.game_state, self.goal_board)
+                        elif self.button_rect.get("hint") and self.button_rect["hint"].collidepoint(mouse_x, mouse_y):
+                            self.show_hint()
 
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP or event.key == pygame.K_w:
@@ -252,6 +264,7 @@ class GUI(BaseGameScreen):
                         return False
 
         if new_game_state != self.game_state:
+            self.hint_message = None
             self.game_state = new_game_state
             self.move_counter += 1
 
@@ -284,19 +297,7 @@ class GUI(BaseGameScreen):
             self.draw_algorithm_menu()
         else:
             self.draw_algorithms()
-            hint_font = pygame.font.SysFont('Arial', 25)  
-            hint_button_text = hint_font.render("Hint", True, (57, 255, 20))
-            hint_button_width, hint_button_height = hint_button_text.get_size()
-
-            hint_button_pos = (self.screen_width / 2 + 430, self.screen_height - hint_button_height - 50)
-            self.screen.blit(hint_button_text, hint_button_pos)
-
-            self.button_rect["hint"] = pygame.Rect(hint_button_pos[0], hint_button_pos[1], hint_button_width, hint_button_height)
-
-            if self.hint_message:
-                hint_msg_pos = (self.screen_width / 2 + 415, self.screen_height - hint_button_height - 20)
-                hint_msg_surface = hint_font.render(self.hint_message, True, (255, 255, 255))
-                self.screen.blit(hint_msg_surface, hint_msg_pos)
+            self.draw_hint()
 
         # Level Info
         self.draw_level_info()
