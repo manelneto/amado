@@ -72,6 +72,7 @@ class GUI(BaseGameScreen):
         self.awaiting_depth_input = False
         self.awaiting_depth_input_algorithm = ""
         self.depth_limit_input = "50" # String for text to be displayed in the box
+        self.no_solution_found = False
 
     def show_hint(self):
         hint_path = algorithms.greedy_search(self.game_state, self.goal_board)
@@ -183,6 +184,15 @@ class GUI(BaseGameScreen):
         self.button_rect["input_box"] = box_rect
         self.screen.blit(box_surface, box_rect.topleft)
 
+        # No solution found text
+        if self.no_solution_found:
+            prompt_2_font = pygame.font.SysFont('Arial', 30)
+            prompt_2_text = "No solution found!"
+            prompt_2_surface = prompt_2_font.render(prompt_2_text, True, (255, 0, 0))
+            prompt_2_position = (self.screen_width - 150, self.screen_height - 150 + 75)
+            prompt_2_rect = prompt_2_surface.get_rect(center=prompt_2_position)
+            self.screen.blit(prompt_2_surface, prompt_2_rect.topleft)
+
     def draw_algorithm_button(self, algorithm: dict, position: tuple):
         mouse_x, mouse_y = pygame.mouse.get_pos()
 
@@ -278,12 +288,25 @@ class GUI(BaseGameScreen):
                     if self.awaiting_depth_input:
                         if event.key == pygame.K_RETURN:
                             if self.awaiting_depth_input_algorithm == "dls":
-                                self.bot_plays = algorithms.depth_limited_search(self.game_state, self.goal_board, int(self.depth_limit_input))
+                                solution = algorithms.depth_limited_search(self.game_state, self.goal_board, int(self.depth_limit_input))
+                                if solution:
+                                    self.no_solution_found = False
+                                    self.bot_plays = solution
+                                    self.awaiting_depth_input = False
+                                    self.depth_limit_input = "50"
+                                else:
+                                    self.no_solution_found = True
+                                    
                             else:
-                                self.bot_plays = algorithms.iterative_deepening_search(self.game_state, self.goal_board, int(self.depth_limit_input))
+                                solution = algorithms.iterative_deepening_search(self.game_state, self.goal_board, int(self.depth_limit_input))
 
-                            self.awaiting_depth_input = False
-                            self.depth_limit_input = "50"
+                                if solution:
+                                    self.no_solution_found = False
+                                    self.bot_plays = solution
+                                    self.awaiting_depth_input = False
+                                    self.depth_limit_input = "50"
+                                else:
+                                    self.no_solution_found = True
 
                         # Delete last digit
                         elif event.key == pygame.K_BACKSPACE:
