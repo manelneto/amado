@@ -71,7 +71,7 @@ class GUI(BaseGameScreen):
 
         self.awaiting_depth_input = False
         self.awaiting_depth_input_algorithm = ""
-        self.depth_limit_input = "0" # String for text to be displayed in the box
+        self.depth_limit_input = "50" # String for text to be displayed in the box
 
     def show_hint(self):
         hint_path = algorithms.greedy_search(self.game_state, self.goal_board)
@@ -274,8 +274,14 @@ class GUI(BaseGameScreen):
                                 self.bot_plays = algorithms.iterative_deepening_search(self.game_state, self.goal_board, int(self.depth_limit_input))
 
                             self.awaiting_depth_input = False
-                            self.depth_limit_input = "0"
-                        else:
+                            self.depth_limit_input = "50"
+
+                        # Delete last digit
+                        elif event.key == pygame.K_BACKSPACE:
+                            self.depth_limit_input = self.depth_limit_input[:-1]
+
+                        # Add a digit
+                        elif event.unicode.isdigit():
                             self.depth_limit_input += event.unicode
 
                     if not self.algorithm_menu:
