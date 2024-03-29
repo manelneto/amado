@@ -168,11 +168,20 @@ class GUI(BaseGameScreen):
             self.screen.blit(hint_msg, hint_msg_pos)
 
     def draw_input_box(self):
+        # Enter input text
+        prompt_font = pygame.font.SysFont('Arial', 30)
+        prompt_text = "Enter depth limit:"
+        prompt_surface = prompt_font.render(prompt_text, True, (255, 255, 255))
+        prompt_position = (self.screen_width - 150, self.screen_height - 150 - 75)
+        prompt_rect = prompt_surface.get_rect(center=prompt_position)
+        self.screen.blit(prompt_surface, prompt_rect.topleft)
+
+        # Input box
         box_surface = self.font.render(str(self.depth_limit_input), True, (255, 255, 255))
-        box_pos = (self.screen_width - 150, self.screen_height - 150)
-        box_rect = box_surface.get_rect(topleft = box_pos)
+        original_center_position = (self.screen_width - 150, self.screen_height - 150)
+        box_rect = box_surface.get_rect(center=original_center_position)
         self.button_rect["input_box"] = box_rect
-        self.screen.blit(box_surface, box_pos)
+        self.screen.blit(box_surface, box_rect.topleft)
 
     def draw_algorithm_button(self, algorithm: dict, position: tuple):
         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -280,9 +289,15 @@ class GUI(BaseGameScreen):
                         elif event.key == pygame.K_BACKSPACE:
                             self.depth_limit_input = self.depth_limit_input[:-1]
 
+                            if self.depth_limit_input == "":
+                                self.depth_limit_input = "0"
+
                         # Add a digit
-                        elif event.unicode.isdigit():
-                            self.depth_limit_input += event.unicode
+                        elif event.unicode.isdigit() and len(self.depth_limit_input) < 10:
+                            if self.depth_limit_input == "0":
+                                self.depth_limit_input = event.unicode
+                            else:
+                                self.depth_limit_input += event.unicode
 
                     if not self.algorithm_menu:
                         if event.key == pygame.K_UP or event.key == pygame.K_w:
