@@ -69,6 +69,10 @@ class GUI(BaseGameScreen):
             {"name": "Weighted A* Search", "key": "wastar", "position": (930, 550)}
         ]
 
+        self.awaiting_depth_input = False
+        self.awaiting_depth_input_algorithm = ""
+        self.depth_limit_input = "0" # String for text to be displayed in the box
+
     def show_hint(self):
         hint_path = algorithms.greedy_search(self.game_state, self.goal_board)
         if hint_path and len(hint_path) > 1:
@@ -163,6 +167,13 @@ class GUI(BaseGameScreen):
             hint_msg = hint_font.render(self.hint_message, True, (255, 255, 255))
             self.screen.blit(hint_msg, hint_msg_pos)
 
+    def draw_input_box(self):
+        box_surface = self.font.render(str(self.depth_limit_input), True, (255, 255, 255))
+        box_pos = (self.screen_width - 150, self.screen_height - 150)
+        box_rect = box_surface.get_rect(topleft = box_pos)
+        self.button_rect["input_box"] = box_rect
+        self.screen.blit(box_surface, box_pos)
+
     def draw_algorithm_button(self, algorithm: dict, position: tuple):
         mouse_x, mouse_y = pygame.mouse.get_pos()
 
@@ -238,9 +249,11 @@ class GUI(BaseGameScreen):
                         elif self.button_rect.get("dfs") and self.button_rect["dfs"].collidepoint(mouse_x, mouse_y):
                             self.bot_plays = algorithms.depth_first_search(self.game_state, self.goal_board)
                         elif self.button_rect.get("dls") and self.button_rect["dls"].collidepoint(mouse_x, mouse_y):
-                            self.bot_plays = algorithms.depth_limited_search(self.game_state, self.goal_board)
+                            self.awaiting_depth_input = True
+                            self.awaiting_depth_input_algorithm = "dls"
                         elif self.button_rect.get("ids") and self.button_rect["ids"].collidepoint(mouse_x, mouse_y):
-                            self.bot_plays = algorithms.iterative_deepening_search(self.game_state, self.goal_board)
+                            self.awaiting_depth_input = True
+                            self.awaiting_depth_input_algorithm = "ids"
                         elif self.button_rect.get("gs") and self.button_rect["gs"].collidepoint(mouse_x, mouse_y):
                             self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board)
                         elif self.button_rect.get("astar") and self.button_rect["astar"].collidepoint(mouse_x, mouse_y):
@@ -249,8 +262,22 @@ class GUI(BaseGameScreen):
                             self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1.5)
                         elif self.button_rect.get("hint") and self.button_rect["hint"].collidepoint(mouse_x, mouse_y):
                             self.show_hint()
+                        elif self.button_rect.get("input_box") and self.button_rect["input_box"].collidepoint(mouse_x, mouse_y):
+                            pass
 
                 elif event.type == pygame.KEYDOWN:
+                    if self.awaiting_depth_input:
+                        if event.key == pygame.K_RETURN:
+                            if self.awaiting_depth_input_algorithm == "dls":
+                                self.bot_plays = algorithms.depth_limited_search(self.game_state, self.goal_board, int(self.depth_limit_input))
+                            else:
+                                self.bot_plays = algorithms.iterative_deepening_search(self.game_state, self.goal_board, int(self.depth_limit_input))
+
+                            self.awaiting_depth_input = False
+                            self.depth_limit_input = "0"
+                        else:
+                            self.depth_limit_input += event.unicode
+
                     if not self.algorithm_menu:
                         if event.key == pygame.K_UP or event.key == pygame.K_w:
                             new_game_state = algorithms.up(self.game_state)
@@ -260,6 +287,7 @@ class GUI(BaseGameScreen):
                             new_game_state = algorithms.left(self.game_state)
                         elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                             new_game_state = algorithms.right(self.game_state)
+
                     if event.key == pygame.K_ESCAPE:
                         if self.change_state_callback:
                             self.change_state_callback('menu')
@@ -299,6 +327,8 @@ class GUI(BaseGameScreen):
         # Side Menu
         if self.bot_plays:
             self.draw_algorithm_menu()
+        elif self.awaiting_depth_input:
+            self.draw_input_box()
         else:
             self.draw_algorithms()
             self.draw_hint()
