@@ -154,14 +154,14 @@ class GUI(BaseGameScreen):
         self.screen.blit(hint_button, hint_button_pos)
         self.button_rect["hint"] = hint_button_rect
 
-        if hint_button_rect.collidepoint(mouse_x, mouse_y):
+        if hint_button_rect.collidepoint(mouse_x, mouse_y) or self.hint_message:
             hint_button = hint_font.render("Hint", True, (57, 255, 20))
             self.screen.blit(hint_button, hint_button_pos)
 
         if self.hint_message:
             hint_msg_pos = (self.screen_width / 2 + 415, self.screen_height - hint_button_height - 20)
-            hint_msg_surface = hint_font.render(self.hint_message, True, (255, 255, 255))
-            self.screen.blit(hint_msg_surface, hint_msg_pos)
+            hint_msg = hint_font.render(self.hint_message, True, (255, 255, 255))
+            self.screen.blit(hint_msg, hint_msg_pos)
 
     def draw_algorithm_button(self, algorithm: dict, position: tuple):
         mouse_x, mouse_y = pygame.mouse.get_pos()
