@@ -185,14 +185,13 @@ def a_star(initial_state: Amado, goal_board: list, weight: int = 1):
     return None
 
 def get_solution(node: TreeNode):
-    print("WINNER!")
     solution = deque([node.game_state])
     i = 0
     while node.parent:
         i += 1
         solution.appendleft(node.parent.game_state)
         node = node.parent
-    print(i)
+    print(i) # TODO
     return solution
 
 def dfs(board: list, row: int, col: int):
@@ -218,8 +217,7 @@ def dfs(board: list, row: int, col: int):
 
     return group_size
 
-def heuristic(game_state: Amado, goal_board: list):
-    # MINIMIZAR
+def heuristic(game_state: Amado, goal_board: list, combine = False):
     different_squares = 0
     distances = []
     new_board = []
@@ -240,6 +238,9 @@ def heuristic(game_state: Amado, goal_board: list):
                 n_squares += 1
         new_board.append(new_row)
 
+    if not combine:
+        return different_squares
+    # TODO
     groups = []
     for row in range(len(new_board)):
         for col in range(len(new_board)):
