@@ -71,7 +71,7 @@ class GUI(BaseGameScreen):
 
         self.awaiting_depth_input = False
         self.awaiting_depth_input_algorithm = ""
-        self.depth_limit_input = "50" # String for text to be displayed in the box
+        self.depth_limit_input = "0" # String for text to be displayed in the box
         self.no_solution_found = False
 
     def show_hint(self):
@@ -293,7 +293,7 @@ class GUI(BaseGameScreen):
                                     self.no_solution_found = False
                                     self.bot_plays = solution
                                     self.awaiting_depth_input = False
-                                    self.depth_limit_input = "50"
+                                    self.depth_limit_input = "0"
                                 else:
                                     self.no_solution_found = True
                                     
@@ -304,7 +304,7 @@ class GUI(BaseGameScreen):
                                     self.no_solution_found = False
                                     self.bot_plays = solution
                                     self.awaiting_depth_input = False
-                                    self.depth_limit_input = "50"
+                                    self.depth_limit_input = "0"
                                 else:
                                     self.no_solution_found = True
 
