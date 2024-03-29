@@ -251,15 +251,16 @@ class GUI(BaseGameScreen):
                             self.show_hint()
 
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP or event.key == pygame.K_w:
-                        new_game_state = algorithms.up(self.game_state)
-                    elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                        new_game_state = algorithms.down(self.game_state)
-                    elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                        new_game_state = algorithms.left(self.game_state)
-                    elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                        new_game_state = algorithms.right(self.game_state)
-                    elif event.key == pygame.K_ESCAPE:
+                    if not self.algorithm_menu:
+                        if event.key == pygame.K_UP or event.key == pygame.K_w:
+                            new_game_state = algorithms.up(self.game_state)
+                        elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                            new_game_state = algorithms.down(self.game_state)
+                        elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                            new_game_state = algorithms.left(self.game_state)
+                        elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                            new_game_state = algorithms.right(self.game_state)
+                    if event.key == pygame.K_ESCAPE:
                         if self.change_state_callback:
                             self.change_state_callback('menu')
                         return False
