@@ -65,7 +65,8 @@ class GUI(BaseGameScreen):
             {"name": "Depth Limited Search", "key": "dls", "position": (930, 350)},
             {"name": "Iterative Deepening Search", "key": "ids", "position": (930, 400)},
             {"name": "Greedy Search", "key": "gs", "position": (930, 450)},
-            {"name": "A* Search", "key": "astar", "position": (930, 500)}
+            {"name": "A* Search", "key": "astar", "position": (930, 500)},
+            {"name": "Weighted A* Search", "key": "wastar", "position": (930, 550)}
         ]
 
     def show_hint(self):
@@ -244,6 +245,8 @@ class GUI(BaseGameScreen):
                             self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board)
                         elif self.button_rect.get("astar") and self.button_rect["astar"].collidepoint(mouse_x, mouse_y):
                             self.bot_plays = algorithms.a_star(self.game_state, self.goal_board)
+                        elif self.button_rect.get("wastar") and self.button_rect["wastar"].collidepoint(mouse_x, mouse_y):
+                            self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1.5)
                         elif self.button_rect.get("hint") and self.button_rect["hint"].collidepoint(mouse_x, mouse_y):
                             self.show_hint()
 

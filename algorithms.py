@@ -160,7 +160,7 @@ def greedy_search(initial_state: Amado, goal_board: list):
         
     return None
 
-def a_star(initial_state: Amado, goal_board: list):
+def a_star(initial_state: Amado, goal_board: list, weight: int = 1):
     root = TreeNode(initial_state)
     queue = deque([(root, heuristic(initial_state, goal_board))])
     visited_states = set([initial_state])
@@ -171,7 +171,7 @@ def a_star(initial_state: Amado, goal_board: list):
         if goal_test(node.game_state, goal_board):
             return get_solution(node)
 
-        child_states = [(state, heuristic(state, goal_board) + node.depth + 1) for state in child_game_states(node.game_state)]
+        child_states = [(state, weight * heuristic(state, goal_board) + node.depth + 1) for state in child_game_states(node.game_state)]
 
         for (state, evaluation) in child_states:
             if state not in visited_states:
