@@ -239,7 +239,7 @@ class GUI(BaseGameScreen):
                         elif self.button_rect.get("dls") and self.button_rect["dls"].collidepoint(mouse_x, mouse_y):
                             self.bot_plays = algorithms.depth_limited_search(self.game_state, self.goal_board)
                         elif self.button_rect.get("ids") and self.button_rect["ids"].collidepoint(mouse_x, mouse_y):
-                            self.bot_plays = algorithms.iterative_deepening_search(self.game_state, self.goal_board, 20)
+                            self.bot_plays = algorithms.iterative_deepening_search(self.game_state, self.goal_board)
                         elif self.button_rect.get("gs") and self.button_rect["gs"].collidepoint(mouse_x, mouse_y):
                             self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board)
                         elif self.button_rect.get("astar") and self.button_rect["astar"].collidepoint(mouse_x, mouse_y):
