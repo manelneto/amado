@@ -94,7 +94,6 @@ class GameScreen(BaseGameScreen):
         self.total_heuristics = 4
         self.awaiting_heuristic_input = False
         self.awaiting_heuristic_input_algorithm = ""
-        self.heuristic_input = 1
 
         self.no_solution_found = False
 
@@ -346,6 +345,10 @@ class GameScreen(BaseGameScreen):
                 self.awaiting_heuristic_input = False
                 if self.awaiting_heuristic_input_algorithm == "gs":
                     self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board, heuristic)[0]
+                elif self.awaiting_heuristic_input_algorithm == "astar":
+                    self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1, heuristic)[0]
+                elif self.awaiting_heuristic_input_algorithm == "wastar":
+                    self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1.5, heuristic)[0]
 
         return self.game_state
 
@@ -402,13 +405,14 @@ class GameScreen(BaseGameScreen):
         elif self.button_rect.get("gs") and self.button_rect["gs"].collidepoint(mouse_x, mouse_y):
             self.awaiting_heuristic_input = True
             self.awaiting_heuristic_input_algorithm = "gs"
-            # self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board)[0]
 
         elif self.button_rect.get("astar") and self.button_rect["astar"].collidepoint(mouse_x, mouse_y):
-            self.bot_plays = algorithms.a_star(self.game_state, self.goal_board)[0]
+            self.awaiting_heuristic_input = True
+            self.awaiting_heuristic_input_algorithm = "astar"
 
         elif self.button_rect.get("wastar") and self.button_rect["wastar"].collidepoint(mouse_x, mouse_y):
-            self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1.5)[0]
+            self.awaiting_heuristic_input = True
+            self.awaiting_heuristic_input_algorithm = "wastar"
 
         elif self.button_rect.get("hint") and self.button_rect["hint"].collidepoint(mouse_x, mouse_y):
             self.show_hint()
