@@ -228,8 +228,19 @@ class GUI(BaseGameScreen):
         counter_position = (10, self.screen_height - 30)
         self.screen.blit(counter_surface, counter_position)
 
+    def bot_move(self) -> Amado:
+        """
+        Makes a bot move
+        returns: Amado -> a new game state
+        """
+        self.bot_play_index += 1
+        return self.bot_plays[self.bot_play_index]
+
+
     # Returns False if the game loop should stop, and True otherwise
     def update(self) -> bool:
+
+        # Check for goal condition reached
         if algorithms.goal_test(self.game_state, self.goal_board):
             time.sleep(0.5)
             self.change_state_callback('win', self.level, self.move_counter)
@@ -238,11 +249,12 @@ class GUI(BaseGameScreen):
         mouse_x, mouse_y = pygame.mouse.get_pos()
         new_game_state = self.game_state
 
+        # Check if a bot is playing
         if self.bot_playing:
-            self.bot_play_index += 1
-            new_game_state = self.bot_plays[self.bot_play_index]
+            new_game_state = self.bot_move()
             time.sleep(1)
         
+        # Handle user actions
         else:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
