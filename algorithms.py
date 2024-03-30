@@ -11,11 +11,11 @@ def goal_test(game_state: Amado, goal_board: list) -> bool:
 
 def move(game_state: Amado, row: int, col: int) -> Amado:
     if game_state.can_move(row, col):
-        color1 = game_state.color(game_state.row, game_state.col)
+        color1 = game_state.current_color()
         color2 = game_state.color(row, col)
         board = deepcopy(game_state.board)
         if color1 != color2:
-            board[row][col] = game_state.swap(color1, color2)
+            board[row][col] = ({'r', 'y', 'b'} - {color1, color2}).pop()
         return Amado(board, row, col)
     else:
         return game_state
@@ -56,15 +56,23 @@ def child_game_states(game_state: Amado) -> list:
 
 class TreeNode:
     def __init__(self, game_state: Amado, parent = None):
+        self.depth = 0
         self.game_state = game_state
         self.parent = parent
         self.children = []
-        self.depth = 0
 
     def add_child(self, child_node):
         self.children.append(child_node)
         child_node.parent = self
         child_node.depth = self.depth + 1
+
+    def __hash__(self):
+        return hash((self.depth, self.game_state))
+    
+    def __eq__(self, other):
+        if not isinstance(other, TreeNode):
+            return False
+        return self.depth == other.depth and self.game_state == other.game_state
 
 def breadth_first_search(initial_state: Amado, goal_board: list):
     root = TreeNode(initial_state)
@@ -106,26 +114,26 @@ def depth_first_search(initial_state: Amado, goal_board: list):
 
     return None
 
-def depth_limited_search(initial_state: Amado, goal_board: list, depth_limit: int = 50):
+def depth_limited_search(initial_state: Amado, goal_board: list, depth_limit: int):
     root = TreeNode(initial_state)
     queue = deque([root])
-    visited_states = set([initial_state])
+    visited_nodes = set()
 
     while queue:
         node = queue.popleft()
 
-        if goal_test(node.game_state, goal_board):
-            return get_solution(node)
-
-        if node.depth == depth_limit:
+        if node.depth == depth_limit or node in visited_nodes:
             continue
-        
+
         for state in child_game_states(node.game_state):
-            if state not in visited_states:
-                new_node = TreeNode(state, node)
-                node.add_child(new_node)
-                queue.appendleft(new_node)
-                visited_states.add(state)
+            new_node = TreeNode(state, node)
+            node.add_child(new_node)
+            queue.appendleft(new_node)
+
+            if goal_test(state, goal_board):
+                return get_solution(new_node)
+
+        visited_nodes.add(node)
 
     return None
 
