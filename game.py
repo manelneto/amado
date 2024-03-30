@@ -101,7 +101,7 @@ class GameScreen(BaseGameScreen):
         """
         Shows a hint for the next move.
         """
-        hint_path = algorithms.greedy_search(self.game_state, self.goal_board)
+        hint_path = algorithms.greedy_search(self.game_state, self.goal_board)[0]
         if hint_path and len(hint_path) > 1:
             next_state = hint_path[1] 
             direction = self.determine_direction(self.game_state, next_state)
