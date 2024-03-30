@@ -345,7 +345,7 @@ class GameScreen(BaseGameScreen):
                 elif self.awaiting_heuristic_input_algorithm == "astar":
                     self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1, heuristic)[0]
                 elif self.awaiting_heuristic_input_algorithm == "wastar":
-                    self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1.5, heuristic)[0]
+                    self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1.7, heuristic)[0]
 
         return self.game_state
 
