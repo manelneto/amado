@@ -240,7 +240,7 @@ def visit_group(board: list, row: int, col: int) -> int:
 
     return group_size
 
-def heuristic(game_state: Amado, goal_board: list, combine = True) -> int:
+def heuristic(game_state: Amado, goal_board: list, choice: int) -> int:
     different_squares = 0
     new_board = []
     n_squares = 0
@@ -258,7 +258,7 @@ def heuristic(game_state: Amado, goal_board: list, combine = True) -> int:
                 n_squares += 1
         new_board.append(new_row)
 
-    if not combine:
+    if choice == 1:
         return different_squares
 
     groups = []
@@ -269,6 +269,16 @@ def heuristic(game_state: Amado, goal_board: list, combine = True) -> int:
 
     different_squares /= n_squares
     n_groups = len(groups)
+
+    if choice == 2:
+        return n_groups
+    
+    max_group = 0
+    if groups:
+        max_group = max(groups)
+
+    if choice == 3:
+        return max_group
 
     if n_squares < 16:
         return 0.9 * different_squares + 0.1 * n_groups

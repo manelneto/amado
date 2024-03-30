@@ -1,6 +1,3 @@
-import pandas as pd
-from matplotlib import pyplot as plt
-
 import time
 from memory_profiler import memory_usage
 import algorithms
