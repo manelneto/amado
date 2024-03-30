@@ -18,7 +18,7 @@ class Amado:
     def __eq__(self, other) -> bool:
         if not isinstance(other, Amado):
             return False
-        return self.board == other.board and self.row == other.row and self.col == other.col
+        return self.col == other.col and self.row == other.row and self.board == other.board
         
     def current_color(self) -> str:
         return self.board[self.row][self.col]
