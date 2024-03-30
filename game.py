@@ -93,7 +93,7 @@ class GameScreen(BaseGameScreen):
 
         self.awaiting_heuristic_input = False
         self.awaiting_heuristic_input_algorithm = ""
-        self.heuristic_input = 0
+        self.heuristic_input = 1
 
         self.no_solution_found = False
 
@@ -242,7 +242,9 @@ class GameScreen(BaseGameScreen):
             self.screen.blit(prompt_2_surface, prompt_2_rect.topleft)
 
     def draw_input_heuristic(self):
-
+        """
+        Draws the input heuristic options on the screen.
+        """
         local_font = pygame.font.SysFont('Arial', 30)
 
         # Choose heuristic text
@@ -250,12 +252,16 @@ class GameScreen(BaseGameScreen):
         text_rect = text_surface.get_rect(center=(self.screen_width - 150, self.screen_height - 200))
         self.screen.blit(text_surface, text_rect.topleft)
 
-        # Heuristics
+        # Heuristics text
         num_heuristics = 4
         start_offset = 50 * (num_heuristics // 2) 
 
         for num in range(1, num_heuristics + 1):
-            heuristic_surface = local_font.render(f"H{num}", True, (255, 255, 255))
+            heuristic_color = (255, 255, 255)
+            if self.heuristic_input == num:
+                heuristic_color = self.highlight_color
+
+            heuristic_surface = local_font.render(f"H{num}", True, heuristic_color)
             heuristic_position = (self.screen_width - 170 - start_offset + 50 * num, self.screen_height - 150)
             heuristic_rect = heuristic_surface.get_rect(center=heuristic_position)
             self.button_rect[f"h{num}"] = heuristic_rect
