@@ -229,10 +229,6 @@ class GUI(BaseGameScreen):
         self.screen.blit(counter_surface, counter_position)
 
     def bot_move(self) -> Amado:
-        """
-        Makes a bot move
-        returns: Amado -> a new game state
-        """
         self.bot_play_index += 1
         return self.bot_plays[self.bot_play_index]
     
@@ -295,6 +291,64 @@ class GUI(BaseGameScreen):
             pass
 
         return self.game_state
+    
+    def handle_level_keyboard(self, event) -> Amado:
+        if self.awaiting_depth_input:
+            return self.handle_keyboard_depth_input(event)
+        if not self.algorithm_menu:
+            return self.handle_keyboard_play(event)
+
+        return self.game_state
+    
+    def handle_keyboard_depth_input(self, event) -> Amado:
+        if event.key == pygame.K_RETURN:
+            if self.awaiting_depth_input_algorithm == "dls":
+                solution = algorithms.depth_limited_search(self.game_state, self.goal_board, int(self.depth_limit_input))
+                if solution:
+                    self.no_solution_found = False
+                    self.bot_plays = solution
+                    self.awaiting_depth_input = False
+                    self.depth_limit_input = "0"
+                else:
+                    self.no_solution_found = True
+                    
+            else:
+                solution = algorithms.iterative_deepening_search(self.game_state, self.goal_board, int(self.depth_limit_input))
+
+                if solution:
+                    self.no_solution_found = False
+                    self.bot_plays = solution
+                    self.awaiting_depth_input = False
+                    self.depth_limit_input = "0"
+                else:
+                    self.no_solution_found = True
+
+        # Delete last digit
+        elif event.key == pygame.K_BACKSPACE:
+            self.depth_limit_input = self.depth_limit_input[:-1]
+
+            if self.depth_limit_input == "":
+                self.depth_limit_input = "0"
+
+        # Add a digit
+        elif event.unicode.isdigit() and len(self.depth_limit_input) < 10:
+            if self.depth_limit_input == "0":
+                self.depth_limit_input = event.unicode
+            else:
+                self.depth_limit_input += event.unicode
+
+        return self.game_state
+
+    def handle_keyboard_play(self, event) -> Amado:
+        if event.key == pygame.K_UP or event.key == pygame.K_w:
+            return algorithms.up(self.game_state)
+        elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+            return algorithms.down(self.game_state)
+        elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
+            return algorithms.left(self.game_state)
+        elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+            return algorithms.right(self.game_state)
+
 
     # Returns False if the game loop should stop, and True otherwise
     def update(self) -> bool:
@@ -305,7 +359,6 @@ class GUI(BaseGameScreen):
             self.change_state_callback('win', self.level, self.move_counter)
             return True
 
-        mouse_x, mouse_y = pygame.mouse.get_pos()
         new_game_state = self.game_state
 
         # Check if a bot is playing
@@ -323,53 +376,9 @@ class GUI(BaseGameScreen):
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     new_game_state = self.handle_level_mouse()
 
+                # Handle keyboard clicks
                 elif event.type == pygame.KEYDOWN:
-                    if self.awaiting_depth_input:
-                        if event.key == pygame.K_RETURN:
-                            if self.awaiting_depth_input_algorithm == "dls":
-                                solution = algorithms.depth_limited_search(self.game_state, self.goal_board, int(self.depth_limit_input))
-                                if solution:
-                                    self.no_solution_found = False
-                                    self.bot_plays = solution
-                                    self.awaiting_depth_input = False
-                                    self.depth_limit_input = "0"
-                                else:
-                                    self.no_solution_found = True
-                                    
-                            else:
-                                solution = algorithms.iterative_deepening_search(self.game_state, self.goal_board, int(self.depth_limit_input))
-
-                                if solution:
-                                    self.no_solution_found = False
-                                    self.bot_plays = solution
-                                    self.awaiting_depth_input = False
-                                    self.depth_limit_input = "0"
-                                else:
-                                    self.no_solution_found = True
-
-                        # Delete last digit
-                        elif event.key == pygame.K_BACKSPACE:
-                            self.depth_limit_input = self.depth_limit_input[:-1]
-
-                            if self.depth_limit_input == "":
-                                self.depth_limit_input = "0"
-
-                        # Add a digit
-                        elif event.unicode.isdigit() and len(self.depth_limit_input) < 10:
-                            if self.depth_limit_input == "0":
-                                self.depth_limit_input = event.unicode
-                            else:
-                                self.depth_limit_input += event.unicode
-
-                    if not self.algorithm_menu:
-                        if event.key == pygame.K_UP or event.key == pygame.K_w:
-                            new_game_state = algorithms.up(self.game_state)
-                        elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                            new_game_state = algorithms.down(self.game_state)
-                        elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                            new_game_state = algorithms.left(self.game_state)
-                        elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                            new_game_state = algorithms.right(self.game_state)
+                    new_game_state = self.handle_level_keyboard(event)
 
                     if event.key == pygame.K_ESCAPE:
                         if self.change_state_callback:
