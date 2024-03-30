@@ -10,17 +10,22 @@ from amado import Amado
 def metrics(func, game_state, goal_board, *args):
     initial_time = time.time()
     initial_mem = memory_usage(-1, interval=0.01, timeout=1, include_children=True)
-    resultado = func(game_state, goal_board, *args)
+    resultado, depth_count = func(game_state, goal_board, *args)
     final_mem = memory_usage(-1, interval=0.01, timeout=1, include_children=True)
     final_time = time.time()
-    
-    print(f"Algorithm: {func.__name__}")
+    total_nodes = sum(depth_count.values())    
+
     print(f"Execution time: {final_time - initial_time:.4f} seconds")
-    print(f"Memory used: {max(final_mem) - min(initial_mem):.4f} MiB\n")
+    print(f"Memory used: {max(final_mem) - min(initial_mem):.4f} MiB")
+    print(f"Nodes explored by depth: {dict(depth_count)}")
+    print(f"Total nodes explored: {total_nodes}\n")
+    print("--------------------------------------------------\n")
+
     return resultado
 
 def main():
     for level in range(1, 11):
+        print(f"\n--- Testing algorithms for level {level} ---\n")
         start_board = levels.STARTS.get(level)  
         goal_board = levels.GOALS.get(level) 
     
@@ -38,7 +43,7 @@ def main():
         ]
         
         for algorithm, args in test_algorithms:
-            print(f"Testing {algorithm.__name__}...")
+            print(f"Testing {algorithm.__name__}...\n")
             metrics(algorithm, *args)
     
     print("Complete analysis.")
