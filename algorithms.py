@@ -114,7 +114,7 @@ def depth_first_search(initial_state: Amado, goal_board: list):
 
     return None
 
-def depth_limited_search(initial_state: Amado, goal_board: list, depth_limit: int):
+def depth_limited_search(initial_state: Amado, goal_board: list, depth_limit: int = 30):
     root = TreeNode(initial_state)
     queue = deque([root])
     visited_nodes = set()
@@ -137,7 +137,7 @@ def depth_limited_search(initial_state: Amado, goal_board: list, depth_limit: in
 
     return None
 
-def iterative_deepening_search(initial_state: Amado, goal_board: list, depth_limit: int = 50):
+def iterative_deepening_search(initial_state: Amado, goal_board: list, depth_limit: int = 30):
     for i in range(depth_limit + 1):
         result = depth_limited_search(initial_state, goal_board, i)
         if result:
