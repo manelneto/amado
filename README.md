@@ -44,7 +44,7 @@ Ao selecionar em algoritmos onde se limita a profundidade, é pedido ao jogador 
 ![Profundidade](photos/depth.png)
 ![Heurística](photos/heuristic.png)
 
-Ao selecionar a opção de dicas, é fornecida a melhor jogada a realizar.
+Ao selecionar a opção de dicas *Hint*, é fornecida a melhor jogada a realizar.
 
 ![Dicas](photos/hint.png)
 
