@@ -21,16 +21,35 @@ class BaseGameScreen:
         pygame.display.set_caption('Amado Game')
 
     def update(self) -> bool:
+        """
+        Updates the game screen.
+
+        Returns:
+            bool: True if the game should continue, False if the game should exit.
+        """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
         return True
 
     def render(self):
+        """
+        Renders the game screen.
+        """
         self.screen.fill(self.background_color)
         pygame.display.flip()
 
     def draw_board(self, pos_x: int, pos_y: int, board: list, scale: int, highlight: bool = False):
+        """
+        Draws the game board on the screen.
+
+        Args:
+            pos_x (int): The x-coordinate of the top-left corner of the board.
+            pos_y (int): The y-coordinate of the top-left corner of the board.
+            board (list): The game board represented as a 2D list.
+            scale (int): The scale factor for the size of each cell.
+            highlight (bool): Whether to highlight the current game state cell.
+        """
         board_size = len(board)
         cell_size = self.game_cell_size * scale
 
@@ -42,7 +61,7 @@ class BaseGameScreen:
                     pygame.draw.rect(self.screen, self.highlight_color, rect, 5)
 
 
-class GUI(BaseGameScreen):
+class GameScreen(BaseGameScreen):
     def __init__(self, game_state: Amado, level: int, change_state_callback):
         super().__init__()
         self.change_state_callback = change_state_callback
@@ -75,6 +94,9 @@ class GUI(BaseGameScreen):
         self.no_solution_found = False
 
     def show_hint(self):
+        """
+        Shows a hint for the next move.
+        """
         hint_path = algorithms.greedy_search(self.game_state, self.goal_board)
         if hint_path and len(hint_path) > 1:
             next_state = hint_path[1] 
@@ -82,6 +104,16 @@ class GUI(BaseGameScreen):
             self.hint_message = f"Go {direction}"
 
     def determine_direction(self, current_state: Amado, next_state: Amado):
+        """
+        Determines the direction to move from the current state to the next state.
+
+        Args:
+            current_state (Amado): The current state of the game.
+            next_state (Amado): The next state of the game.
+
+        Returns:
+            str: The direction to move.
+        """
         row_diff = next_state.row - current_state.row
         col_diff = next_state.col - current_state.col
         if row_diff == -1:
@@ -95,6 +127,9 @@ class GUI(BaseGameScreen):
         return "any valid direction"
 
     def draw_algorithm_menu(self):
+        """
+        Draws the algorithm menu on the screen.
+        """
         self.algorithm_menu = True
         mouse_x, mouse_y = pygame.mouse.get_pos()
 
@@ -143,12 +178,18 @@ class GUI(BaseGameScreen):
             self.screen.blit(arrow_left, arrow_left_pos)
 
     def draw_algorithms(self):
+        """
+        Draws the available algorithms on the screen.
+        """
         self.algorithm_menu = False
         
         for algorithm in self.algorithms:
             self.draw_algorithm_button(algorithm, algorithm['position'])
 
     def draw_hint(self):
+        """
+        Draws the hint button and message on the screen.
+        """
         mouse_x, mouse_y = pygame.mouse.get_pos()
 
         hint_font = pygame.font.SysFont('Arial', 25)
@@ -169,6 +210,9 @@ class GUI(BaseGameScreen):
             self.screen.blit(hint_msg, hint_msg_pos)
 
     def draw_input_box(self):
+        """
+        Draws the input box for the depth limit on the screen.
+        """
         # Enter input text
         prompt_font = pygame.font.SysFont('Arial', 30)
         prompt_text = "Enter depth limit:"
@@ -194,6 +238,13 @@ class GUI(BaseGameScreen):
             self.screen.blit(prompt_2_surface, prompt_2_rect.topleft)
 
     def draw_algorithm_button(self, algorithm: dict, position: tuple):
+        """
+        Draws a button for the specified algorithm on the screen.
+
+        Args:
+            algorithm (dict): The algorithm information.
+            position (tuple): The position of the button on the screen.
+        """
         mouse_x, mouse_y = pygame.mouse.get_pos()
 
         default_color = (255, 255, 255)
@@ -210,6 +261,9 @@ class GUI(BaseGameScreen):
         self.button_rect[algorithm['key']] = algo_rect  # Store the button rect for click detection
 
     def draw_level_info(self):
+        """
+        Draws the level information on the screen.
+        """
         # Red Line
         pygame.draw.line(self.screen, self.colors['r'], (self.screen_width - 300, 0), (self.screen_width - 300, self.screen_height), 5)
         
@@ -229,15 +283,33 @@ class GUI(BaseGameScreen):
         self.screen.blit(counter_surface, counter_position)
 
     def bot_move(self) -> Amado:
+        """
+        Moves the bot to the next state.
+
+        Returns:
+            Amado: The next state of the game.
+        """
         self.bot_play_index += 1
         return self.bot_plays[self.bot_play_index]
     
     def handle_level_mouse(self) -> Amado:
+        """
+        Handles mouse events on the game screen.
+
+        Returns:
+            Amado: The next state of the game.
+        """
         if self.algorithm_menu:
             return self.handle_mouse_algorithm_menu()
         return self.handle_mouse_choose_algorithm()
 
     def handle_mouse_algorithm_menu(self) -> Amado:
+        """
+        Handles mouse events on the algorithm menu.
+
+        Returns:
+            Amado: The next state of the game.
+        """
         mouse_x, mouse_y = pygame.mouse.get_pos()
 
         if self.button_rect.get("auto_run") and self.button_rect["auto_run"].collidepoint(mouse_x, mouse_y):
@@ -259,6 +331,12 @@ class GUI(BaseGameScreen):
         return self.game_state
 
     def handle_mouse_choose_algorithm(self) -> Amado:
+        """
+        Handles the mouse click event for choosing an algorithm.
+
+        Returns:
+            The updated game state.
+        """
         mouse_x, mouse_y = pygame.mouse.get_pos()
 
         if self.button_rect.get("bfs") and self.button_rect["bfs"].collidepoint(mouse_x, mouse_y):
@@ -293,6 +371,15 @@ class GUI(BaseGameScreen):
         return self.game_state
     
     def handle_level_keyboard(self, event) -> Amado:
+        """
+        Handles keyboard events for the level screen.
+
+        Args:
+            event (pygame.event.Event): The keyboard event to handle.
+
+        Returns:
+            Amado: The updated game state after handling the keyboard event.
+        """
         if self.awaiting_depth_input:
             return self.handle_keyboard_depth_input(event)
         if not self.algorithm_menu:
@@ -301,6 +388,16 @@ class GUI(BaseGameScreen):
         return self.game_state
     
     def handle_keyboard_depth_input(self, event) -> Amado:
+        """
+        Handles keyboard input for setting the depth limit in the game.
+
+        Args:
+            event (pygame.event.Event): The keyboard event to handle.
+
+        Returns:
+            Amado: The updated game state after handling the keyboard event.
+
+        """
         if event.key == pygame.K_RETURN:
             if self.awaiting_depth_input_algorithm == "dls":
                 solution = algorithms.depth_limited_search(self.game_state, self.goal_board, int(self.depth_limit_input))
@@ -340,6 +437,16 @@ class GUI(BaseGameScreen):
         return self.game_state
 
     def handle_keyboard_play(self, event) -> Amado:
+        """
+        Handles keyboard input for gameplay.
+
+        Args:
+            event: The keyboard event triggered by the user.
+
+        Returns:
+            Amado: The updated game state after applying the corresponding algorithm based on the keyboard input.
+
+        """
         if event.key == pygame.K_UP or event.key == pygame.K_w:
             return algorithms.up(self.game_state)
         elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
@@ -350,8 +457,13 @@ class GUI(BaseGameScreen):
             return algorithms.right(self.game_state)
 
 
-    # Returns False if the game loop should stop, and True otherwise
     def update(self) -> bool:
+        """
+        Updates the game state and handles user actions or bot moves.
+
+        Returns:
+            bool: False if the game loop should stop, and True otherwise.
+        """
 
         # Check for goal condition reached
         if algorithms.goal_test(self.game_state, self.goal_board):
@@ -365,13 +477,13 @@ class GUI(BaseGameScreen):
         if self.bot_playing:
             new_game_state = self.bot_move()
             time.sleep(1)
-        
+
         # Handle user actions
         else:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return False
-                
+
                 # Handle mouse clicks
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     new_game_state = self.handle_level_mouse()
@@ -395,6 +507,13 @@ class GUI(BaseGameScreen):
         return True
 
     def render(self):
+        """
+        Renders the game screen.
+
+        This method fills the screen with the background color and draws the game board, goal board, side menu, and level info.
+        If the bot is playing, it also draws the algorithm menu. If the user is inputting the depth, it draws the input box.
+        Finally, it updates the display to show the rendered screen.
+        """
         self.screen.fill(self.background_color)
 
         # Game Board
@@ -440,6 +559,9 @@ class MainMenu(BaseGameScreen):
         self.level_cols = 5
 
     def draw_main_menu(self):
+        """
+        Draws the main menu of the game.
+        """
         # Title
         title_font = pygame.font.SysFont('Arial', 90)
         title_surface = title_font.render("Amado", True, (255, 255, 255))
@@ -451,6 +573,11 @@ class MainMenu(BaseGameScreen):
         self.draw_levels_menu()
 
     def draw_levels_menu(self):
+        """
+        Draws the levels menu on the screen.
+
+        This method calculates the layout of the levels menu and draws each level on the screen.
+        """
         margin = 50
         top_margin_offset = 250
         content_height = self.screen_height - (margin * 2) - top_margin_offset
@@ -483,8 +610,15 @@ class MainMenu(BaseGameScreen):
             mini_board_scale = 0.15
             self.draw_board(mini_board_pos_x, mini_board_pos_y, level_board, mini_board_scale)
 
-    # Returns False if the game loop should stop, and True otherwise
     def update(self) -> bool:
+        """
+        Updates the main menu screen.
+
+        This method handles user input events and updates the selected level accordingly.
+
+        Returns:
+            bool: False if the game loop should stop, True otherwise.
+        """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
@@ -509,6 +643,11 @@ class MainMenu(BaseGameScreen):
         return True
 
     def render(self):
+        """
+        Renders the main menu screen.
+
+        This method fills the screen with the background color, draws the main menu, and updates the display.
+        """
         self.screen.fill(self.background_color)
         self.draw_main_menu()
         pygame.display.flip()
@@ -522,6 +661,11 @@ class WinMenu(BaseGameScreen):
         self.score = score
 
     def draw_win_menu(self):
+        """
+        Draws the win menu on the screen.
+
+        This method displays the level completed message, the score, and the instruction to press ESC for the menu.
+        """
         # Level X Completed
         level_completed = pygame.font.SysFont('Arial', 75).render(f"Level {self.level} Completed!", True, (57, 255, 20))
         level_completed_pos = (self.screen_width / 2 - level_completed.get_width() / 2, 150)
@@ -537,8 +681,13 @@ class WinMenu(BaseGameScreen):
         counter_position = (10, self.screen_height - 30)
         self.screen.blit(counter_surface, counter_position)
 
-    # Returns False if the game loop should stop, and True otherwise
     def update(self) -> bool:
+        """
+        Updates the win menu screen.
+
+        Returns:
+            bool: False if the game loop should stop, True otherwise.
+        """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
@@ -551,6 +700,9 @@ class WinMenu(BaseGameScreen):
         return True
     
     def render(self):
+        """
+        Renders the win menu screen.
+        """
         self.screen.fill(self.background_color)
         self.draw_win_menu()
         pygame.display.flip()
