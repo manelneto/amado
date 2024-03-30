@@ -340,10 +340,10 @@ class GameScreen(BaseGameScreen):
         mouse_x, mouse_y = pygame.mouse.get_pos()
 
         if self.button_rect.get("bfs") and self.button_rect["bfs"].collidepoint(mouse_x, mouse_y):
-            self.bot_plays = algorithms.breadth_first_search(self.game_state, self.goal_board)
+            self.bot_plays = algorithms.breadth_first_search(self.game_state, self.goal_board)[0]
 
         elif self.button_rect.get("dfs") and self.button_rect["dfs"].collidepoint(mouse_x, mouse_y):
-            self.bot_plays = algorithms.depth_first_search(self.game_state, self.goal_board)
+            self.bot_plays = algorithms.depth_first_search(self.game_state, self.goal_board)[0]
 
         elif self.button_rect.get("dls") and self.button_rect["dls"].collidepoint(mouse_x, mouse_y):
             self.awaiting_depth_input = True
@@ -354,13 +354,13 @@ class GameScreen(BaseGameScreen):
             self.awaiting_depth_input_algorithm = "ids"
 
         elif self.button_rect.get("gs") and self.button_rect["gs"].collidepoint(mouse_x, mouse_y):
-            self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board)
+            self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board)[0]
 
         elif self.button_rect.get("astar") and self.button_rect["astar"].collidepoint(mouse_x, mouse_y):
-            self.bot_plays = algorithms.a_star(self.game_state, self.goal_board)
+            self.bot_plays = algorithms.a_star(self.game_state, self.goal_board)[0]
 
         elif self.button_rect.get("wastar") and self.button_rect["wastar"].collidepoint(mouse_x, mouse_y):
-            self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1.5)
+            self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1.5)[0]
 
         elif self.button_rect.get("hint") and self.button_rect["hint"].collidepoint(mouse_x, mouse_y):
             self.show_hint()
@@ -400,7 +400,7 @@ class GameScreen(BaseGameScreen):
         """
         if event.key == pygame.K_RETURN:
             if self.awaiting_depth_input_algorithm == "dls":
-                solution = algorithms.depth_limited_search(self.game_state, self.goal_board, int(self.depth_limit_input))
+                solution = algorithms.depth_limited_search(self.game_state, self.goal_board, int(self.depth_limit_input))[0]
                 if solution:
                     self.no_solution_found = False
                     self.bot_plays = solution
@@ -410,7 +410,7 @@ class GameScreen(BaseGameScreen):
                     self.no_solution_found = True
                     
             else:
-                solution = algorithms.iterative_deepening_search(self.game_state, self.goal_board, int(self.depth_limit_input))
+                solution = algorithms.iterative_deepening_search(self.game_state, self.goal_board, int(self.depth_limit_input))[0]
 
                 if solution:
                     self.no_solution_found = False

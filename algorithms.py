@@ -1,6 +1,7 @@
 from amado import Amado 
 from collections import deque
 from copy import deepcopy
+from collections import defaultdict
 
 # Goal Test
 
@@ -74,17 +75,19 @@ class TreeNode:
             return False
         return self.depth == other.depth and self.game_state == other.game_state
 
-def breadth_first_search(initial_state: Amado, goal_board: list) -> deque | None:
+def breadth_first_search(initial_state: Amado, goal_board: list) -> tuple | None:
     root = TreeNode(initial_state)
     queue = deque([root])
     visited_states = set([initial_state])
+    depth_count = defaultdict(int)
 
     while queue:
         node = queue.popleft()
         current_state = node.game_state
+        depth_count[node.depth] += 1
 
         if goal_test(current_state, goal_board):
-            return get_solution(node)
+            return get_solution(node), depth_count
 
         for state in child_game_states(current_state):
             if state not in visited_states:
@@ -93,15 +96,17 @@ def breadth_first_search(initial_state: Amado, goal_board: list) -> deque | None
                 queue.append(new_node)
                 visited_states.add(state)
             
-    return None
+    return None, depth_count
 
-def depth_first_search(initial_state: Amado, goal_board: list) -> deque | None:
+def depth_first_search(initial_state: Amado, goal_board: list) -> tuple | None:
     root = TreeNode(initial_state)
     queue = deque([root])
     visited_states = set([initial_state])
+    depth_count = defaultdict(int)
 
     while queue:
         node = queue.popleft()
+        depth_count[node.depth] += 1
         
         for state in child_game_states(node.game_state):
             if state not in visited_states:
@@ -111,17 +116,19 @@ def depth_first_search(initial_state: Amado, goal_board: list) -> deque | None:
                 visited_states.add(state)
 
                 if goal_test(state, goal_board):
-                    return get_solution(new_node)
+                    return get_solution(new_node), depth_count
 
-    return None
+    return None, depth_count
 
-def depth_limited_search(initial_state: Amado, goal_board: list, depth_limit: int) -> deque | None:
+def depth_limited_search(initial_state: Amado, goal_board: list, depth_limit: int) -> tuple | None:
     root = TreeNode(initial_state)
     queue = deque([root])
     visited_nodes = set()
+    depth_count = defaultdict(int)
 
     while queue:
         node = queue.popleft()
+        depth_count[node.depth] += 1
 
         if node.depth == depth_limit or node in visited_nodes:
             continue
@@ -132,30 +139,33 @@ def depth_limited_search(initial_state: Amado, goal_board: list, depth_limit: in
             queue.appendleft(new_node)
 
             if goal_test(state, goal_board):
-                return get_solution(new_node)
+                return get_solution(new_node), depth_count
 
         visited_nodes.add(node)
 
-    return None
+    return None, depth_count
 
-def iterative_deepening_search(initial_state: Amado, goal_board: list, depth_limit: int) -> deque | None:
+def iterative_deepening_search(initial_state: Amado, goal_board: list, depth_limit: int) -> tuple | None:
+    depth_count = defaultdict(int)
     for i in range(depth_limit + 1):
         result = depth_limited_search(initial_state, goal_board, i)
         if result:
             return result
     return None
 
-def greedy_search(initial_state: Amado, goal_board: list) -> deque | None:
+def greedy_search(initial_state: Amado, goal_board: list) -> tuple | None:
     root = TreeNode(initial_state)
     queue = deque([(root, heuristic(initial_state, goal_board))])
     visited_states = set([initial_state])
+    depth_count = defaultdict(int)
 
     while queue:
         node, value = queue.popleft()
         current_state = node.game_state
+        depth_count[node.depth] += 1
 
         if goal_test(current_state, goal_board):
-            return get_solution(node)
+            return get_solution(node), depth_count
         
         child_states = [(state, heuristic(state, goal_board)) for state in child_game_states(current_state)]
 
@@ -168,19 +178,21 @@ def greedy_search(initial_state: Amado, goal_board: list) -> deque | None:
         
         queue = deque(sorted(queue, key = lambda element: element[1]))
         
-    return None
+    return None, depth_count
 
-def a_star(initial_state: Amado, goal_board: list, weight: int = 1) -> deque | None:
+def a_star(initial_state: Amado, goal_board: list, weight: int = 1) -> tuple | None:
     root = TreeNode(initial_state)
     queue = deque([(root, heuristic(initial_state, goal_board))])
     visited_states = set([initial_state])
+    depth_count = defaultdict(int)
 
     while queue:
         node, value = queue.popleft()
         current_state = node.game_state
+        depth_count[node.depth] += 1
 
         if goal_test(current_state, goal_board):
-            return get_solution(node)
+            return get_solution(node), depth_count
 
         child_states = [(state, weight * heuristic(state, goal_board) + node.depth + 1) for state in child_game_states(current_state)]
 
@@ -193,7 +205,7 @@ def a_star(initial_state: Amado, goal_board: list, weight: int = 1) -> deque | N
 
         queue = deque(sorted(queue, key = lambda element: element[1]))
 
-    return None
+    return None, depth_count
 
 def get_solution(node: TreeNode) -> deque:
     solution = deque([node.game_state])
@@ -202,7 +214,7 @@ def get_solution(node: TreeNode) -> deque:
         i += 1
         solution.appendleft(node.parent.game_state)
         node = node.parent
-    print(i) # TODO
+    #print(i) # TODO
     return solution
 
 def dfs(board: list, row: int, col: int) -> int:
