@@ -20,25 +20,26 @@ def metrics(func, game_state, goal_board, *args):
     return resultado
 
 def main():
-    start_board = levels.STARTS.get(1)  
-    goal_board = levels.GOALS.get(1)  
+    for level in range(1, 11):
+        start_board = levels.STARTS.get(level)  
+        goal_board = levels.GOALS.get(level) 
     
-    row, col = 0, 0  
-    game_state = Amado(start_board, row, col) 
-    
-    test_algorithms = [
-        (algorithms.breadth_first_search, [game_state, goal_board]),
-        (algorithms.depth_first_search, [game_state, goal_board]),
-        (algorithms.depth_limited_search, [game_state, goal_board, 20]), 
-        (algorithms.iterative_deepening_search, [game_state, goal_board, 20]),
-        (algorithms.greedy_search, [game_state, goal_board]),
-        (algorithms.a_star, [game_state, goal_board]),
-        (algorithms.a_star, [game_state, goal_board, 1]),  
-    ]
-    
-    for algorithm, args in test_algorithms:
-        print(f"Testing {algorithm.__name__}...")
-        metrics(algorithm, *args)
+        row, col = 0, 0  
+        game_state = Amado(start_board, row, col) 
+        
+        test_algorithms = [
+            (algorithms.breadth_first_search, [game_state, goal_board]),
+            (algorithms.depth_first_search, [game_state, goal_board]),
+            (algorithms.depth_limited_search, [game_state, goal_board, 20]), 
+            (algorithms.iterative_deepening_search, [game_state, goal_board, 20]),
+            (algorithms.greedy_search, [game_state, goal_board]),
+            (algorithms.a_star, [game_state, goal_board]),
+            (algorithms.a_star, [game_state, goal_board, 1]),  
+        ]
+        
+        for algorithm, args in test_algorithms:
+            print(f"Testing {algorithm.__name__}...")
+            metrics(algorithm, *args)
     
     print("Complete analysis.")
 
