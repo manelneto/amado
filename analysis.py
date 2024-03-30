@@ -1,6 +1,52 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 
+import time
+from memory_profiler import memory_usage
+import algorithms
+import levels
+from amado import Amado
+
+def metrics(func, game_state, goal_board, *args):
+    initial_time = time.time()
+    initial_mem = memory_usage(-1, interval=0.01, timeout=1, include_children=True)
+    resultado = func(game_state, goal_board, *args)
+    final_mem = memory_usage(-1, interval=0.01, timeout=1, include_children=True)
+    final_time = time.time()
+    
+    print(f"Algorithm: {func.__name__}")
+    print(f"Execution time: {final_time - initial_time:.4f} seconds")
+    print(f"Memory used: {max(final_mem) - min(initial_mem):.4f} MiB\n")
+    return resultado
+
+def main():
+    start_board = levels.STARTS.get(1)  
+    goal_board = levels.GOALS.get(1)  
+    
+    row, col = 0, 0  
+    game_state = Amado(start_board, row, col) 
+    
+    test_algorithms = [
+        (algorithms.breadth_first_search, [game_state, goal_board]),
+        (algorithms.depth_first_search, [game_state, goal_board]),
+        (algorithms.depth_limited_search, [game_state, goal_board, 20]), 
+        (algorithms.iterative_deepening_search, [game_state, goal_board, 20]),
+        (algorithms.greedy_search, [game_state, goal_board]),
+        (algorithms.a_star, [game_state, goal_board]),
+        (algorithms.a_star, [game_state, goal_board, 1]),  
+    ]
+    
+    for algorithm, args in test_algorithms:
+        print(f"Testing {algorithm.__name__}...")
+        metrics(algorithm, *args)
+    
+    print("Complete analysis.")
+
+if __name__ == "__main__":
+    main()
+
+
+"""
 def create_graphs():
     # Load the results file into a pandas DataFrame
     results_df = pd.read_excel('results.xlsx', sheet_name='Data')
@@ -77,3 +123,4 @@ def create_graphs():
 if __name__ == "__main__":
     #analysis()
     create_graphs()
+"""
