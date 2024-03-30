@@ -12,13 +12,13 @@ Manuel Ramos Leite Carvalho Neto 202108744
 
 ## Configurações
 
-Para correr o jogo é necessário correr no terminal o seguinte comando
+Para iniciar o jogo é necessário correr no terminal o seguinte comando
 
 ```bash
 python main.py
 ```
 
-Para ter acesso a análise dos algoritmos é necessário instalar a biblioteca de python e correr o comando
+Para ter acesso a análise dos algoritmos é necessário instalar a biblioteca de python *memory_profiler* e correr o comando
 
 ```bash
 pip install memory_profiler
