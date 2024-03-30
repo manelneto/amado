@@ -12,33 +12,19 @@ class Amado:
                     self.col = col
                     break
 
-    def __hash__(self):
-        return hash(self.__str__())
-
-    def __eq__(self, other):
-        if isinstance(self, other.__class__):
-            return self.board == other.board and self.row == other.row and self.col == other.col
-        else:
+    def __hash__(self) -> int:
+        return hash((tuple(map(tuple, self.board)), self.row, self.col))
+    
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Amado):
             return False
-
-    def __str__(self):
-        res = '|'
-        for row in range(self.board_size):
-            for col in range(self.board_size):
-                if row == self.row and col == self.col:
-                    res += self.board[row][col].upper()
-                else:
-                    res += self.board[row][col]
-            res += '|'
-        return ' '.join(list(res))
+        return self.board == other.board and self.row == other.row and self.col == other.col
+        
+    def current_color(self) -> str:
+        return self.board[self.row][self.col]
 
     def color(self, row: int, col: int) -> str:
         return self.board[row][col]
 
     def can_move(self, row: int, col: int) -> bool:
         return row >= 0 and row < self.board_size and col >= 0 and col < self.board_size and self.color(row, col) != 'n'
-
-    def swap(self, color1: str, color2: str) -> str:
-        colors = {'r', 'y', 'b'}
-        color3 = colors - {color1, color2}
-        return color3.pop()
