@@ -91,6 +91,7 @@ class GameScreen(BaseGameScreen):
         self.awaiting_depth_input_algorithm = ""
         self.depth_limit_input = "0" # String for text to be displayed in the box
 
+        self.total_heuristics = 4
         self.awaiting_heuristic_input = False
         self.awaiting_heuristic_input_algorithm = ""
         self.heuristic_input = 1
@@ -245,6 +246,7 @@ class GameScreen(BaseGameScreen):
         """
         Draws the input heuristic options on the screen.
         """
+        mouse_x, mouse_y = pygame.mouse.get_pos()
         local_font = pygame.font.SysFont('Arial', 30)
 
         # Choose heuristic text
@@ -257,15 +259,15 @@ class GameScreen(BaseGameScreen):
         start_offset = 50 * (num_heuristics // 2) 
 
         for num in range(1, num_heuristics + 1):
-            heuristic_color = (255, 255, 255)
-            if self.heuristic_input == num:
-                heuristic_color = self.highlight_color
-
-            heuristic_surface = local_font.render(f"H{num}", True, heuristic_color)
+            heuristic_surface = local_font.render(f"H{num}", True, (255, 255, 255))
             heuristic_position = (self.screen_width - 170 - start_offset + 50 * num, self.screen_height - 150)
             heuristic_rect = heuristic_surface.get_rect(center=heuristic_position)
             self.button_rect[f"h{num}"] = heuristic_rect
             self.screen.blit(heuristic_surface, heuristic_rect.topleft)
+
+            if heuristic_rect.collidepoint(mouse_x, mouse_y):
+                heuristic_surface = local_font.render(f"H{num}", True, (self.highlight_color))
+                self.screen.blit(heuristic_surface, heuristic_rect.topleft)
 
 
     def draw_algorithm_button(self, algorithm: dict, position: tuple):
@@ -330,9 +332,22 @@ class GameScreen(BaseGameScreen):
         Returns:
             Amado: The next state of the game.
         """
+        if self.awaiting_heuristic_input:
+            return self.handle_mouse_heuristic_input()
         if self.algorithm_menu:
             return self.handle_mouse_algorithm_menu()
         return self.handle_mouse_choose_algorithm()
+    
+    def handle_mouse_heuristic_input(self) -> Amado:
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+
+        for heuristic in range(1, self.total_heuristics + 1):
+            if self.button_rect.get(f"h{heuristic}") and self.button_rect[f"h{heuristic}"].collidepoint(mouse_x, mouse_y):
+                self.awaiting_heuristic_input = False
+                if self.awaiting_heuristic_input_algorithm == "gs":
+                    self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board, heuristic)[0]
+
+        return self.game_state
 
     def handle_mouse_algorithm_menu(self) -> Amado:
         """
