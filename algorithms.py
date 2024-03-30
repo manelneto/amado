@@ -153,9 +153,9 @@ def iterative_deepening_search(initial_state: Amado, goal_board: list, depth_lim
             return result
     return None
 
-def greedy_search(initial_state: Amado, goal_board: list) -> tuple | None:
+def greedy_search(initial_state: Amado, goal_board: list, heuristic_num : int = 4) -> tuple | None:
     root = TreeNode(initial_state)
-    queue = deque([(root, heuristic(initial_state, goal_board))])
+    queue = deque([(root, heuristic(initial_state, goal_board, heuristic_num))])
     visited_states = set([initial_state])
     depth_count = defaultdict(int)
 
@@ -167,7 +167,7 @@ def greedy_search(initial_state: Amado, goal_board: list) -> tuple | None:
         if goal_test(current_state, goal_board):
             return get_solution(node), depth_count
         
-        child_states = [(state, heuristic(state, goal_board)) for state in child_game_states(current_state)]
+        child_states = [(state, heuristic(state, goal_board, heuristic_num)) for state in child_game_states(current_state)]
 
         for (state, evaluation) in child_states:
             if state not in visited_states:
@@ -180,9 +180,9 @@ def greedy_search(initial_state: Amado, goal_board: list) -> tuple | None:
         
     return None, depth_count
 
-def a_star(initial_state: Amado, goal_board: list, weight: int = 1) -> tuple | None:
+def a_star(initial_state: Amado, goal_board: list, weight: int = 1, heuristic_num : int = 4) -> tuple | None:
     root = TreeNode(initial_state)
-    queue = deque([(root, heuristic(initial_state, goal_board))])
+    queue = deque([(root, heuristic(initial_state, goal_board, heuristic_num))])
     visited_states = set([initial_state])
     depth_count = defaultdict(int)
 
@@ -194,7 +194,7 @@ def a_star(initial_state: Amado, goal_board: list, weight: int = 1) -> tuple | N
         if goal_test(current_state, goal_board):
             return get_solution(node), depth_count
 
-        child_states = [(state, weight * heuristic(state, goal_board) + node.depth + 1) for state in child_game_states(current_state)]
+        child_states = [(state, weight * heuristic(state, goal_board, heuristic_num) + node.depth + 1) for state in child_game_states(current_state)]
 
         for (state, evaluation) in child_states:
             if state not in visited_states:

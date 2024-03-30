@@ -4,7 +4,6 @@ import levels
 import pygame
 import time
 
-
 class BaseGameScreen:
     def __init__(self, screen_width: int = 1200, screen_height: int = 750, change_state_callback = None):
         self.screen_width = screen_width
@@ -91,13 +90,18 @@ class GameScreen(BaseGameScreen):
         self.awaiting_depth_input = False
         self.awaiting_depth_input_algorithm = ""
         self.depth_limit_input = "0" # String for text to be displayed in the box
+
+        self.total_heuristics = 4
+        self.awaiting_heuristic_input = False
+        self.awaiting_heuristic_input_algorithm = ""
+
         self.no_solution_found = False
 
     def show_hint(self):
         """
         Shows a hint for the next move.
         """
-        hint_path = algorithms.greedy_search(self.game_state, self.goal_board)
+        hint_path = algorithms.greedy_search(self.game_state, self.goal_board)[0]
         if hint_path and len(hint_path) > 1:
             next_state = hint_path[1] 
             direction = self.determine_direction(self.game_state, next_state)
@@ -237,6 +241,34 @@ class GameScreen(BaseGameScreen):
             prompt_2_rect = prompt_2_surface.get_rect(center=prompt_2_position)
             self.screen.blit(prompt_2_surface, prompt_2_rect.topleft)
 
+    def draw_input_heuristic(self):
+        """
+        Draws the input heuristic options on the screen.
+        """
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        local_font = pygame.font.SysFont('Arial', 30)
+
+        # Choose heuristic text
+        text_surface = local_font.render("Choose the heuristic:", True, (255, 255, 255))
+        text_rect = text_surface.get_rect(center=(self.screen_width - 150, self.screen_height - 200))
+        self.screen.blit(text_surface, text_rect.topleft)
+
+        # Heuristics text
+        num_heuristics = 4
+        start_offset = 50 * (num_heuristics // 2) 
+
+        for num in range(1, num_heuristics + 1):
+            heuristic_surface = local_font.render(f"H{num}", True, (255, 255, 255))
+            heuristic_position = (self.screen_width - 170 - start_offset + 50 * num, self.screen_height - 150)
+            heuristic_rect = heuristic_surface.get_rect(center=heuristic_position)
+            self.button_rect[f"h{num}"] = heuristic_rect
+            self.screen.blit(heuristic_surface, heuristic_rect.topleft)
+
+            if heuristic_rect.collidepoint(mouse_x, mouse_y):
+                heuristic_surface = local_font.render(f"H{num}", True, (self.highlight_color))
+                self.screen.blit(heuristic_surface, heuristic_rect.topleft)
+
+
     def draw_algorithm_button(self, algorithm: dict, position: tuple):
         """
         Draws a button for the specified algorithm on the screen.
@@ -299,9 +331,26 @@ class GameScreen(BaseGameScreen):
         Returns:
             Amado: The next state of the game.
         """
+        if self.awaiting_heuristic_input:
+            return self.handle_mouse_heuristic_input()
         if self.algorithm_menu:
             return self.handle_mouse_algorithm_menu()
         return self.handle_mouse_choose_algorithm()
+    
+    def handle_mouse_heuristic_input(self) -> Amado:
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+
+        for heuristic in range(1, self.total_heuristics + 1):
+            if self.button_rect.get(f"h{heuristic}") and self.button_rect[f"h{heuristic}"].collidepoint(mouse_x, mouse_y):
+                self.awaiting_heuristic_input = False
+                if self.awaiting_heuristic_input_algorithm == "gs":
+                    self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board, heuristic)[0]
+                elif self.awaiting_heuristic_input_algorithm == "astar":
+                    self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1, heuristic)[0]
+                elif self.awaiting_heuristic_input_algorithm == "wastar":
+                    self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1.5, heuristic)[0]
+
+        return self.game_state
 
     def handle_mouse_algorithm_menu(self) -> Amado:
         """
@@ -354,13 +403,16 @@ class GameScreen(BaseGameScreen):
             self.awaiting_depth_input_algorithm = "ids"
 
         elif self.button_rect.get("gs") and self.button_rect["gs"].collidepoint(mouse_x, mouse_y):
-            self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board)[0]
+            self.awaiting_heuristic_input = True
+            self.awaiting_heuristic_input_algorithm = "gs"
 
         elif self.button_rect.get("astar") and self.button_rect["astar"].collidepoint(mouse_x, mouse_y):
-            self.bot_plays = algorithms.a_star(self.game_state, self.goal_board)[0]
+            self.awaiting_heuristic_input = True
+            self.awaiting_heuristic_input_algorithm = "astar"
 
         elif self.button_rect.get("wastar") and self.button_rect["wastar"].collidepoint(mouse_x, mouse_y):
-            self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1.5)[0]
+            self.awaiting_heuristic_input = True
+            self.awaiting_heuristic_input_algorithm = "wastar"
 
         elif self.button_rect.get("hint") and self.button_rect["hint"].collidepoint(mouse_x, mouse_y):
             self.show_hint()
@@ -540,6 +592,8 @@ class GameScreen(BaseGameScreen):
             self.draw_algorithm_menu()
         elif self.awaiting_depth_input:
             self.draw_input_box()
+        elif self.awaiting_heuristic_input:
+            self.draw_input_heuristic()
         else:
             self.draw_algorithms()
             self.draw_hint()
