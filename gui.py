@@ -235,7 +235,66 @@ class GUI(BaseGameScreen):
         """
         self.bot_play_index += 1
         return self.bot_plays[self.bot_play_index]
+    
+    def handle_level_mouse(self) -> Amado:
+        if self.algorithm_menu:
+            return self.handle_mouse_algorithm_menu()
+        return self.handle_mouse_choose_algorithm()
 
+    def handle_mouse_algorithm_menu(self) -> Amado:
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+
+        if self.button_rect.get("auto_run") and self.button_rect["auto_run"].collidepoint(mouse_x, mouse_y):
+            self.bot_playing = True
+
+        elif self.button_rect.get("exit_button") and self.button_rect["exit_button"].collidepoint(mouse_x, mouse_y):
+            self.bot_play_index = 0
+            self.bot_plays = []
+
+        elif self.button_rect.get("arrow_right") and self.button_rect["arrow_right"].collidepoint(mouse_x, mouse_y):
+            self.bot_play_index += 1
+            return self.bot_plays[self.bot_play_index]
+        
+        elif self.move_counter > 0 and self.button_rect.get("arrow_left") and self.button_rect["arrow_left"].collidepoint(mouse_x, mouse_y):
+            self.bot_play_index -= 1
+            self.move_counter -= 2
+            return self.bot_plays[self.bot_play_index]
+        
+        return self.game_state
+
+    def handle_mouse_choose_algorithm(self) -> Amado:
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+
+        if self.button_rect.get("bfs") and self.button_rect["bfs"].collidepoint(mouse_x, mouse_y):
+            self.bot_plays = algorithms.breadth_first_search(self.game_state, self.goal_board)
+
+        elif self.button_rect.get("dfs") and self.button_rect["dfs"].collidepoint(mouse_x, mouse_y):
+            self.bot_plays = algorithms.depth_first_search(self.game_state, self.goal_board)
+
+        elif self.button_rect.get("dls") and self.button_rect["dls"].collidepoint(mouse_x, mouse_y):
+            self.awaiting_depth_input = True
+            self.awaiting_depth_input_algorithm = "dls"
+
+        elif self.button_rect.get("ids") and self.button_rect["ids"].collidepoint(mouse_x, mouse_y):
+            self.awaiting_depth_input = True
+            self.awaiting_depth_input_algorithm = "ids"
+
+        elif self.button_rect.get("gs") and self.button_rect["gs"].collidepoint(mouse_x, mouse_y):
+            self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board)
+
+        elif self.button_rect.get("astar") and self.button_rect["astar"].collidepoint(mouse_x, mouse_y):
+            self.bot_plays = algorithms.a_star(self.game_state, self.goal_board)
+
+        elif self.button_rect.get("wastar") and self.button_rect["wastar"].collidepoint(mouse_x, mouse_y):
+            self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1.5)
+
+        elif self.button_rect.get("hint") and self.button_rect["hint"].collidepoint(mouse_x, mouse_y):
+            self.show_hint()
+
+        elif self.button_rect.get("input_box") and self.button_rect["input_box"].collidepoint(mouse_x, mouse_y):
+            pass
+
+        return self.game_state
 
     # Returns False if the game loop should stop, and True otherwise
     def update(self) -> bool:
@@ -260,41 +319,9 @@ class GUI(BaseGameScreen):
                 if event.type == pygame.QUIT:
                     return False
                 
+                # Handle mouse clicks
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.algorithm_menu:
-                        if self.button_rect.get("auto_run") and self.button_rect["auto_run"].collidepoint(mouse_x, mouse_y):
-                            self.bot_playing = True
-                        elif self.button_rect.get("exit_button") and self.button_rect["exit_button"].collidepoint(mouse_x, mouse_y):
-                            self.bot_play_index = 0
-                            self.bot_plays = []
-                        elif self.button_rect.get("arrow_right") and self.button_rect["arrow_right"].collidepoint(mouse_x, mouse_y):
-                            self.bot_play_index += 1
-                            new_game_state = self.bot_plays[self.bot_play_index]
-                        elif self.move_counter > 0 and self.button_rect.get("arrow_left") and self.button_rect["arrow_left"].collidepoint(mouse_x, mouse_y):
-                            self.bot_play_index -= 1
-                            self.move_counter -= 2
-                            new_game_state = self.bot_plays[self.bot_play_index]
-                    else:
-                        if self.button_rect.get("bfs") and self.button_rect["bfs"].collidepoint(mouse_x, mouse_y):
-                            self.bot_plays = algorithms.breadth_first_search(self.game_state, self.goal_board)
-                        elif self.button_rect.get("dfs") and self.button_rect["dfs"].collidepoint(mouse_x, mouse_y):
-                            self.bot_plays = algorithms.depth_first_search(self.game_state, self.goal_board)
-                        elif self.button_rect.get("dls") and self.button_rect["dls"].collidepoint(mouse_x, mouse_y):
-                            self.awaiting_depth_input = True
-                            self.awaiting_depth_input_algorithm = "dls"
-                        elif self.button_rect.get("ids") and self.button_rect["ids"].collidepoint(mouse_x, mouse_y):
-                            self.awaiting_depth_input = True
-                            self.awaiting_depth_input_algorithm = "ids"
-                        elif self.button_rect.get("gs") and self.button_rect["gs"].collidepoint(mouse_x, mouse_y):
-                            self.bot_plays = algorithms.greedy_search(self.game_state, self.goal_board)
-                        elif self.button_rect.get("astar") and self.button_rect["astar"].collidepoint(mouse_x, mouse_y):
-                            self.bot_plays = algorithms.a_star(self.game_state, self.goal_board)
-                        elif self.button_rect.get("wastar") and self.button_rect["wastar"].collidepoint(mouse_x, mouse_y):
-                            self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1.5)
-                        elif self.button_rect.get("hint") and self.button_rect["hint"].collidepoint(mouse_x, mouse_y):
-                            self.show_hint()
-                        elif self.button_rect.get("input_box") and self.button_rect["input_box"].collidepoint(mouse_x, mouse_y):
-                            pass
+                    new_game_state = self.handle_level_mouse()
 
                 elif event.type == pygame.KEYDOWN:
                     if self.awaiting_depth_input:
