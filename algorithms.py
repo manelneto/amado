@@ -137,13 +137,13 @@ class TreeNode:
         self.children = []
         self.depth = 0
 
-    """
-    Adds a child node to this node.
-    
-    Parameters:
-        child_node (TreeNode): The child node to be added.
-    """
     def add_child(self, child_node):
+        """
+        Adds a child node to this node.
+        
+        Parameters:
+            child_node (TreeNode): The child node to be added.
+        """
         self.children.append(child_node)
         child_node.parent = self
         child_node.depth = self.depth + 1
@@ -156,7 +156,7 @@ class TreeNode:
             return False
         return self.depth == other.depth and self.game_state == other.game_state
 
-def breadth_first_search(initial_state: Amado, goal_board: list) -> tuple | None:
+def breadth_first_search(initial_state: Amado, goal_board: list, analysis: bool = False) -> tuple | None:
     """
     Performs breadth-first search from an initial state to a goal state.
 
@@ -175,7 +175,9 @@ def breadth_first_search(initial_state: Amado, goal_board: list) -> tuple | None
     while queue:
         node = queue.popleft()
         current_state = node.game_state
-        depth_count[node.depth] += 1
+        
+        if analysis:
+            depth_count[node.depth] += 1
 
         if goal_test(current_state, goal_board):
             return get_solution(node), depth_count
@@ -189,7 +191,7 @@ def breadth_first_search(initial_state: Amado, goal_board: list) -> tuple | None
             
     return None, depth_count
 
-def depth_first_search(initial_state: Amado, goal_board: list) -> tuple | None:
+def depth_first_search(initial_state: Amado, goal_board: list,  analysis: bool = False) -> tuple | None:
     """
     Performs depth-first search from an initial state to a goal state.
 
@@ -207,7 +209,9 @@ def depth_first_search(initial_state: Amado, goal_board: list) -> tuple | None:
 
     while queue:
         node = queue.popleft()
-        depth_count[node.depth] += 1
+
+        if analysis:
+            depth_count[node.depth] += 1
         
         for state in child_game_states(node.game_state):
             if state not in visited_states:
@@ -221,7 +225,7 @@ def depth_first_search(initial_state: Amado, goal_board: list) -> tuple | None:
 
     return None, depth_count
 
-def depth_limited_search(initial_state: Amado, goal_board: list, depth_limit: int) -> tuple | None:
+def depth_limited_search(initial_state: Amado, goal_board: list, depth_limit: int, analysis: bool = False) -> tuple | None:
     """
     Performs depth-limited search from an initial state to a goal state, up to a specified depth.
 
@@ -240,7 +244,9 @@ def depth_limited_search(initial_state: Amado, goal_board: list, depth_limit: in
 
     while queue:
         node = queue.popleft()
-        depth_count[node.depth] += 1
+
+        if analysis:
+            depth_count[node.depth] += 1
 
         if node.depth == depth_limit or node in visited_nodes:
             continue
@@ -257,7 +263,7 @@ def depth_limited_search(initial_state: Amado, goal_board: list, depth_limit: in
 
     return None, depth_count
 
-def iterative_deepening_search(initial_state: Amado, goal_board: list, depth_limit: int) -> tuple | None:
+def iterative_deepening_search(initial_state: Amado, goal_board: list, depth_limit: int, analysis: bool = False) -> tuple | None:
     """
     Performs iterative deepening search from an initial state to a goal state. This method incrementally increases the depth limit until the goal is found or the depth limit is reached.
 
@@ -269,14 +275,13 @@ def iterative_deepening_search(initial_state: Amado, goal_board: list, depth_lim
     Returns:
         tuple | None: A tuple containing the solution path (if found) and aggregated search statistics across all depths, or None if a solution is not found within the depth limit.
     """
-    depth_count = defaultdict(int)
     for i in range(depth_limit + 1):
-        result = depth_limited_search(initial_state, goal_board, i)
-        if result:
+        result = depth_limited_search(initial_state, goal_board, i, analysis)
+        if result[0]:
             return result
     return None
 
-def greedy_search(initial_state: Amado, goal_board: list, heuristic_num : int = 4) -> tuple | None:
+def greedy_search(initial_state: Amado, goal_board: list, heuristic_num : int = 4,  analysis: bool = False) -> tuple | None:
     """
     Performs greedy search from an initial state to a goal state, using a heuristic to prioritize nodes.
 
@@ -296,7 +301,9 @@ def greedy_search(initial_state: Amado, goal_board: list, heuristic_num : int = 
     while queue:
         node, value = queue.popleft()
         current_state = node.game_state
-        depth_count[node.depth] += 1
+
+        if analysis:
+            depth_count[node.depth] += 1
 
         if goal_test(current_state, goal_board):
             return get_solution(node), depth_count
@@ -314,7 +321,7 @@ def greedy_search(initial_state: Amado, goal_board: list, heuristic_num : int = 
         
     return None, depth_count
 
-def a_star(initial_state: Amado, goal_board: list, weight: int = 1, heuristic_num : int = 4) -> tuple | None:
+def a_star(initial_state: Amado, goal_board: list, weight: int = 1, heuristic_num : int = 4, analysis: bool = False) -> tuple | None:
     """
     Performs A* search from an initial state to a goal state. Combines the cost to reach the node and a heuristic estimate of the cost to reach the goal.
 
@@ -335,7 +342,9 @@ def a_star(initial_state: Amado, goal_board: list, weight: int = 1, heuristic_nu
     while queue:
         node, value = queue.popleft()
         current_state = node.game_state
-        depth_count[node.depth] += 1
+
+        if analysis:
+            depth_count[node.depth] += 1
 
         if goal_test(current_state, goal_board):
             return get_solution(node), depth_count
@@ -354,16 +363,33 @@ def a_star(initial_state: Amado, goal_board: list, weight: int = 1, heuristic_nu
     return None, depth_count
 
 def get_solution(node: TreeNode) -> deque:
+    """
+    Retrieves the solution path from the given node to the root node.
+
+    Parameters:
+        node (TreeNode): The node from which to start retrieving the solution path.
+
+    Returns:
+        deque: A deque containing the game states along the solution path, from the given node to the root node.
+    """
     solution = deque([node.game_state])
-    i = 0
     while node.parent:
-        i += 1
         solution.appendleft(node.parent.game_state)
         node = node.parent
-    #print(i) # TODO
     return solution
 
 def visit_group(board: list, row: int, col: int) -> int:
+    """
+    Performs a depth-first search to visit a group of connected cells on the board.
+
+    Parameters:
+        board (list): A 2D list representing the game board, where True indicates an unvisited cell and False indicates a visited cell.
+        row (int): The row index of the starting position to visit.
+        col (int): The column index of the starting position to visit.
+
+    Returns:
+        int: The size of the group of connected cells starting from the given position.
+    """
     queue = deque([(row, col)])
     group_size = 0
 
