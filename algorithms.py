@@ -153,7 +153,7 @@ def iterative_deepening_search(initial_state: Amado, goal_board: list, depth_lim
             return result
     return None
 
-def greedy_search(initial_state: Amado, goal_board: list) -> deque | None:
+def greedy_search(initial_state: Amado, goal_board: list) -> tuple | None:
     root = TreeNode(initial_state)
     queue = deque([(root, heuristic(initial_state, goal_board))])
     visited_states = set([initial_state])
@@ -162,9 +162,10 @@ def greedy_search(initial_state: Amado, goal_board: list) -> deque | None:
     while queue:
         node, value = queue.popleft()
         current_state = node.game_state
+        depth_count[node.depth] += 1
 
         if goal_test(current_state, goal_board):
-            return get_solution(node)
+            return get_solution(node), depth_count
         
         child_states = [(state, heuristic(state, goal_board)) for state in child_game_states(current_state)]
 
@@ -177,9 +178,9 @@ def greedy_search(initial_state: Amado, goal_board: list) -> deque | None:
         
         queue = deque(sorted(queue, key = lambda element: element[1]))
         
-    return None
+    return None, depth_count
 
-def a_star(initial_state: Amado, goal_board: list, weight: int = 1) -> deque | None:
+def a_star(initial_state: Amado, goal_board: list, weight: int = 1) -> tuple | None:
     root = TreeNode(initial_state)
     queue = deque([(root, heuristic(initial_state, goal_board))])
     visited_states = set([initial_state])
@@ -188,9 +189,10 @@ def a_star(initial_state: Amado, goal_board: list, weight: int = 1) -> deque | N
     while queue:
         node, value = queue.popleft()
         current_state = node.game_state
+        depth_count[node.depth] += 1
 
         if goal_test(current_state, goal_board):
-            return get_solution(node)
+            return get_solution(node), depth_count
 
         child_states = [(state, weight * heuristic(state, goal_board) + node.depth + 1) for state in child_game_states(current_state)]
 
@@ -203,7 +205,7 @@ def a_star(initial_state: Amado, goal_board: list, weight: int = 1) -> deque | N
 
         queue = deque(sorted(queue, key = lambda element: element[1]))
 
-    return None
+    return None, depth_count
 
 def get_solution(node: TreeNode) -> deque:
     solution = deque([node.game_state])
