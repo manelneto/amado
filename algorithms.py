@@ -217,7 +217,7 @@ def get_solution(node: TreeNode) -> deque:
     #print(i) # TODO
     return solution
 
-def dfs(board: list, row: int, col: int) -> int:
+def visit_group(board: list, row: int, col: int) -> int:
     queue = deque([(row, col)])
     group_size = 0
 
@@ -240,9 +240,8 @@ def dfs(board: list, row: int, col: int) -> int:
 
     return group_size
 
-def heuristic(game_state: Amado, goal_board: list, combine = False) -> int:
+def heuristic(game_state: Amado, goal_board: list, combine = True) -> int:
     different_squares = 0
-    distances = []
     new_board = []
     n_squares = 0
 
@@ -251,8 +250,6 @@ def heuristic(game_state: Amado, goal_board: list, combine = False) -> int:
         for col in range(game_state.board_size):
             if game_state.board[row][col] != goal_board[row][col]:
                 different_squares += 1
-                distance = abs(game_state.row - row) + abs(game_state.col - col)
-                distances.append(distance)
                 new_row.append(True)
             else:
                 new_row.append(False)
@@ -263,23 +260,16 @@ def heuristic(game_state: Amado, goal_board: list, combine = False) -> int:
 
     if not combine:
         return different_squares
-    # TODO
-    groups = []
-    for row in range(len(new_board)):
-        for col in range(len(new_board)):
-            if new_board[row][col]:
-                groups.append(dfs(new_board, row, col))
 
-    max_group = 0
-    if groups:
-        max_group = max(groups)
+    groups = []
+    for row in range(game_state.board_size):
+        for col in range(game_state.board_size):
+            if new_board[row][col]:
+                groups.append(visit_group(new_board, row, col))
 
     different_squares /= n_squares
-    max_group /= n_squares
-    n_groups = len(groups) / n_squares / 2
+    n_groups = len(groups)
 
-    p1 = min(different_squares, max_group, n_groups)
-    p3 = max(different_squares, max_group, n_groups)
-    p2 = different_squares + max_group + n_groups - p1 - p3
-
-    return 0.5 * p1 + 0.3 * p2 + 0.2 * p3
+    if n_squares < 16:
+        return 0.9 * different_squares + 0.1 * n_groups
+    return 0.99 * different_squares + 0.01 * n_groups
