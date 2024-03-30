@@ -42,7 +42,7 @@ class BaseGameScreen:
         """
         Draws the game board on the screen.
 
-        Args:
+        Parameters:
             pos_x (int): The x-coordinate of the top-left corner of the board.
             pos_y (int): The y-coordinate of the top-left corner of the board.
             board (list): The game board represented as a 2D list.
@@ -89,7 +89,7 @@ class GameScreen(BaseGameScreen):
 
         self.awaiting_depth_input = False
         self.awaiting_depth_input_algorithm = ""
-        self.depth_limit_input = "0" # String for text to be displayed in the box
+        self.depth_limit_input = "0"
 
         self.total_heuristics = 4
         self.awaiting_heuristic_input = False
@@ -111,7 +111,7 @@ class GameScreen(BaseGameScreen):
         """
         Determines the direction to move from the current state to the next state.
 
-        Args:
+        Parameters:
             current_state (Amado): The current state of the game.
             next_state (Amado): The next state of the game.
 
@@ -248,12 +248,10 @@ class GameScreen(BaseGameScreen):
         mouse_x, mouse_y = pygame.mouse.get_pos()
         local_font = pygame.font.SysFont('Arial', 30)
 
-        # Choose heuristic text
         text_surface = local_font.render("Choose the heuristic:", True, (255, 255, 255))
         text_rect = text_surface.get_rect(center=(self.screen_width - 150, self.screen_height - 200))
         self.screen.blit(text_surface, text_rect.topleft)
 
-        # Heuristics text
         num_heuristics = 4
         start_offset = 50 * (num_heuristics // 2) 
 
@@ -273,7 +271,7 @@ class GameScreen(BaseGameScreen):
         """
         Draws a button for the specified algorithm on the screen.
 
-        Args:
+        Parameters:
             algorithm (dict): The algorithm information.
             position (tuple): The position of the button on the screen.
         """
@@ -284,13 +282,12 @@ class GameScreen(BaseGameScreen):
         
         algo_surface = pygame.font.SysFont('Arial', 25).render(algorithm['name'], True, default_color)
         algo_rect = algo_surface.get_rect(topleft=position)
-        
-        # If mouse hovers over the button, change the color
+      
         if algo_rect.collidepoint(mouse_x, mouse_y):
             algo_surface = pygame.font.SysFont('Arial', 25).render(algorithm['name'], True, hover_color)
         
         self.screen.blit(algo_surface, position)
-        self.button_rect[algorithm['key']] = algo_rect  # Store the button rect for click detection
+        self.button_rect[algorithm['key']] = algo_rect 
 
     def draw_level_info(self):
         """
@@ -348,7 +345,7 @@ class GameScreen(BaseGameScreen):
                 elif self.awaiting_heuristic_input_algorithm == "astar":
                     self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1, heuristic)[0]
                 elif self.awaiting_heuristic_input_algorithm == "wastar":
-                    self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1.5, heuristic)[0]
+                    self.bot_plays = algorithms.a_star(self.game_state, self.goal_board, 1.7, heuristic)[0]
 
         return self.game_state
 
@@ -426,7 +423,7 @@ class GameScreen(BaseGameScreen):
         """
         Handles keyboard events for the level screen.
 
-        Args:
+        Parameters:
             event (pygame.event.Event): The keyboard event to handle.
 
         Returns:
@@ -443,7 +440,7 @@ class GameScreen(BaseGameScreen):
         """
         Handles keyboard input for setting the depth limit in the game.
 
-        Args:
+        Parameters:
             event (pygame.event.Event): The keyboard event to handle.
 
         Returns:
@@ -492,7 +489,7 @@ class GameScreen(BaseGameScreen):
         """
         Handles keyboard input for gameplay.
 
-        Args:
+        Parameters:
             event: The keyboard event triggered by the user.
 
         Returns:
