@@ -1,6 +1,6 @@
 # Jogo Amado
 
-## Elementos do groupo
+## Elementos do grupo
 
 **Group A1_42**
 
