@@ -504,6 +504,7 @@ class GameScreen(BaseGameScreen):
             return algorithms.left(self.game_state)
         elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
             return algorithms.right(self.game_state)
+        return self.game_state
 
 
     def update(self) -> bool:
