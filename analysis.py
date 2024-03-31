@@ -34,8 +34,8 @@ def measure_level(level):
         (algorithms.depth_limited_search, (game_state, goal_board, 20, True)), 
         (algorithms.iterative_deepening_search, (game_state, goal_board, 20, True)),
         (algorithms.greedy_search, (game_state, goal_board, 4, True)),
-        (algorithms.a_star, (game_state, goal_board, 1, 4, True)),
-        (algorithms.a_star, (game_state, goal_board, 1.7, 4, True)),  
+        (algorithms.a_star, (game_state, goal_board, 1, 1, True)),
+        (algorithms.a_star, (game_state, goal_board, 2, 1, True)),  
     ]
 
     file = open("level" + str(level) + ".txt", "a")
