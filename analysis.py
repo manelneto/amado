@@ -17,7 +17,7 @@ def metrics(f, args):
     print(f"Memory used: {max(mem_usage):.4f} MiB")
     print(f"Nodes explored by depth: {dict(depth_count)}")
     print(f"Total nodes explored: {total_nodes}")
-    print(f"Solution found: {len(solution)} movements")
+    print(f"Solution found: {len(solution) - 1} movements")
     print("\n--------------------------------------------------\n")
 
 def measure_level(level):
