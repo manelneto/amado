@@ -5,7 +5,7 @@ import levels
 import time
 import sys
 
-def metrics(f, args):
+def metrics(file, f, args):
     func = (f, args, {})
     initial_time = time.time()
     mem_usage, result = memory_usage(func, include_children = True, retval = True)
@@ -13,15 +13,16 @@ def metrics(f, args):
     final_time = time.time()
     total_nodes = sum(depth_count.values())
 
-    print(f"Execution time: {final_time - initial_time:.4f} seconds")
-    print(f"Memory used: {max(mem_usage):.4f} MiB")
-    print(f"Nodes explored by depth: {dict(depth_count)}")
-    print(f"Total nodes explored: {total_nodes}")
-    print(f"Solution found: {len(solution) - 1} movements")
-    print("\n--------------------------------------------------\n")
+    print(f"Execution time: {final_time - initial_time:.4f} seconds", file = file)
+    print(f"Memory used: {max(mem_usage):.4f} MiB", file = file)
+    print(f"Nodes explored by depth: {dict(depth_count)}", file = file)
+    print(f"Total nodes explored: {total_nodes}", file = file)
+    print(f"Solution found: {len(solution) - 1} movements", file = file)
+    print("\n--------------------------------------------------\n", file = file)
 
 def measure_level(level):
-    print(f"\n--- Testing algorithms for level {level} ---\n")
+    print(f"\n--- Started measurements for level {level} ---\n")
+
     start_board = levels.STARTS.get(level)
     goal_board = levels.GOALS.get(level)
 
@@ -36,10 +37,16 @@ def measure_level(level):
         (algorithms.a_star, (game_state, goal_board, 1, 4, True)),
         (algorithms.a_star, (game_state, goal_board, 1.7, 4, True)),  
     ]
-    
+
+    file = open("level" + str(level) + ".txt", "a")
+
     for algorithm, args in test_algorithms:
-        print(f"Testing {algorithm.__name__}...\n")
-        metrics(algorithm, args)
+        print(f"Testing {algorithm.__name__}...\n", file = file)
+        metrics(file, algorithm, args)
+
+    file.close()
+
+    print(f"\n--- Completed measurements for level {level} ---\n")
 
 def measure_levels():
     for level in range(1, 11):
