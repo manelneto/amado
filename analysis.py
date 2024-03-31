@@ -9,15 +9,16 @@ def metrics(f, args):
     func = (f, args, {})
     initial_time = time.time()
     mem_usage, result = memory_usage(func, include_children = True, retval = True)
-    depth_count = result[1]
+    solution, depth_count = result
     final_time = time.time()
     total_nodes = sum(depth_count.values())
 
     print(f"Execution time: {final_time - initial_time:.4f} seconds")
     print(f"Memory used: {max(mem_usage):.4f} MiB")
     print(f"Nodes explored by depth: {dict(depth_count)}")
-    print(f"Total nodes explored: {total_nodes}\n")
-    print("--------------------------------------------------\n")
+    print(f"Total nodes explored: {total_nodes}")
+    print(f"Solution found: {len(solution)} movements")
+    print("\n--------------------------------------------------\n")
 
 def measure_level(level):
     print(f"\n--- Testing algorithms for level {level} ---\n")
