@@ -371,6 +371,9 @@ class GameScreen(BaseGameScreen):
         
         elif self.move_counter > 0 and self.button_rect.get("arrow_left") and self.button_rect["arrow_left"].collidepoint(mouse_x, mouse_y):
             self.bot_play_index -= 1
+            if self.bot_play_index < 0:
+                self.bot_play_index = 0
+                return self.bot_plays[self.bot_play_index]
             self.move_counter -= 2
             return self.bot_plays[self.bot_play_index]
         
