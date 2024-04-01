@@ -1,12 +1,14 @@
 # Jogo Amado
 
+Este projeto foi desenvolvido no âmbito da Unidade Curricular **Inteligência Artificial (IA)** do 2º semestre do 3º ano da **Licenciatura em Engenharia Informática e Computação (LEIC)** da **Faculdade de Engenharia da Universidade do Porto (FEUP)**, no ano letivo 2023/2024.
+
 ## Identificação do Grupo
 
 Grupo: **Group A1_42**
 
 * António Marujo Rama - up202108801
-* Matilde Isabel da Silva Simões - up202108782
 * Manuel Ramos Leite Carvalho Neto - up202108744
+* Matilde Isabel da Silva Simões - up202108782
 
 ## Como correr o programa
 
