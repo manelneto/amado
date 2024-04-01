@@ -279,7 +279,7 @@ def iterative_deepening_search(initial_state: Amado, goal_board: list, depth_lim
         result = depth_limited_search(initial_state, goal_board, i, analysis)
         if result[0]:
             return result
-    return None
+    return None, defaultdict(int)
 
 def greedy_search(initial_state: Amado, goal_board: list, heuristic_num : int = 4,  analysis: bool = False) -> tuple | None:
     """
